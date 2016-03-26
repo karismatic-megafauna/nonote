@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michaelghinrichs/node-notes.git"
+    "url": "git+https://github.com/michaelghinrichs/nonote.git"
   },
   "keywords": [
     "node",
@@ -24,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/michaelghinrichs/node-notes/issues"
   },
-  "homepage": "https://github.com/michaelghinrichs/node-notes#readme",
+  "homepage": "https://github.com/michaelghinrichs/nonote#readme",
   "dependencies": {
     "chalk": "^1.1.1",
     "co": "^4.6.0",
