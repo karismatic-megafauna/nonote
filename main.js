@@ -16,12 +16,9 @@ var today = moment().format("DD-MM-YYYY");
 // Replate code/node-notes with path from config
 
 function getConfig() {
-  try {
-    var config = process.env['HOME'] + '/.nonoterc.json';
-    return fs.readJsonSync(config).notesDirectory;
-  } catch (e) {
-    return console.error( e + '\n No .nonoterc defined at the root, run `$ nonnote init` to obtain!');
-  }
+  var config = process.env['HOME'] + '/.nonoterc.json';
+  // TODO: handle the case of `nonote new` when `nonote init` has not been run
+  return fs.readJsonSync(config).notesDirectory;
 }
 
 function initializeNotes(userDir) {
