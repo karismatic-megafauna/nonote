@@ -1,0 +1,39 @@
+{
+  "name": "nonote",
+  "version": "1.0.0",
+  "description": "a node application for taking notes",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelghinrichs/node-notes.git"
+  },
+  "keywords": [
+    "node",
+    "notes",
+    "cli"
+  ],
+  "author": "Michael George Hinrichs",
+  "license": "ISC",
+  "bin": {
+    "nonote": "./main.js",
+    "nono": "./main.js"
+  },
+  "bugs": {
+    "url": "https://github.com/michaelghinrichs/node-notes/issues"
+  },
+  "homepage": "https://github.com/michaelghinrichs/node-notes#readme",
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "co": "^4.6.0",
+    "co-prompt": "^1.0.0",
+    "commander": "^2.9.0",
+    "fs-extra": "^0.26.7",
+    "jsonfile": "^2.2.3",
+    "mkdirp": "^0.5.1",
+    "moment": "^2.12.0",
+    "superagent": "^1.8.1"
+  }
+}

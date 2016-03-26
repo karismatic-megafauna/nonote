@@ -1,0 +1,28 @@
+{
+  "Daily Objectives": {
+    "cli-ref": "do",
+    "description": "things to do every day",
+    "items": [
+      "shoot a bow",
+      "exercise",
+      "code a thing",
+      "write a story",
+      "read a book",
+      "speak a foreign language"
+    ]
+  },
+  "Personal Notes": {
+    "cli-ref": "pn",
+    "description": "notes for personal development",
+    "items": [
+      "get home before 6"
+    ]
+  },
+  "Work Notes": {
+    "cli-ref": "wn",
+    "description": "notes for the workday",
+    "items": [
+      "get in before 8"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "Daily Objectives": {
+    "cli-ref": "do",
+    "description": "things to do every day",
+    "items": [
+      {
+        "description": "shoot a bow",
+        "status": "incomplete"
+      },
+      {
+        "description": "exercise",
+        "status": "incomplete"
+      },
+      {
+        "description": "code a thing",
+        "status": "incomplete"
+      },
+      {
+        "description": "write a story",
+        "status": "incomplete"
+      },
+      {
+        "description": "read a book",
+        "status": "incomplete"
+      },
+      {
+        "description": "speak a foreign language",
+        "status": "incomplete"
+      }
+    ]
+  },
+  "Personal Notes": {
+    "cli-ref": "pn",
+    "description": "notes for personal development",
+    "items": [
+      {
+        "description": "get home before 6",
+        "status": "incomplete"
+      }
+    ]
+  },
+  "Work Notes": {
+    "cli-ref": "wn",
+    "description": "notes for the workday",
+    "items": [
+      {
+        "description": "get in before 8",
+        "status": "incomplete"
+      }
+    ]
+  }
+}
