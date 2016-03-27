@@ -16,10 +16,14 @@ function getConfig() {
 
 function createDir(create, path) {
   if (create) {
-    console.log('Aight, making a notes directory for ya :)');
+    console.log(' ');
+    console.log('Aight, making a notes directory for ya at this location:');
     console.log(path);
     // fs.mkdirsSync(path);
+    console.log(' ');
+    console.log(chalk.green('Success!'));
   } else {
+    console.log(' ');
     console.log('Awesome, make sure that dir exsists!');
   }
 }
@@ -33,11 +37,13 @@ function initializeNotes(userDir) {
 
   fs.writeJsonSync(rcFile, dotFileJSON);
   console.log(' ');
-  console.log(chalk.yellow('Success!') + ' Config file `.nonoterc.json` created:' );
+  console.log(chalk.green('Success!'));
+  console.log(' ');
+  console.log('Config file `.nonoterc.json` created:' );
   console.log(chalk.cyan(rcFile));
   console.log(' ');
   console.log(chalk.cyan('nonote new') + ' will create a new note in this directory: ')
-  console.log(chalk.blue.inverse(dotFileJSON.notesDirectory));
+  console.log(chalk.yellow(dotFileJSON.notesDirectory));
   console.log(' ');
 }
 
@@ -215,12 +221,13 @@ program
     cmdValue = cmd;
     co(function *() {
 
-      var notesDirPath = yield prompt('notes directory path (from HOME): ');
+      var notesDirPath = yield prompt('notes directory path (from $HOME): ');
       var homePath = process.env['HOME'] + '/' + notesDirPath;
       initializeNotes(homePath);
 
       var shouldCreate = yield prompt.confirm('Would you like me to create "' + homePath + '" for you? [y/N] ');
       createDir(shouldCreate, homePath);
+      console.log('Start taking notes with ' + chalk.cyan('nonote new!'));
       process.exit();
     })
   });
