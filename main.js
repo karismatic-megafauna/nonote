@@ -8,19 +8,21 @@ var moment = require('moment');
 var co = require('co');
 var prompt = require('co-prompt');
 
-// Globals
-var today = moment().format("DD-MM-YYYY");
-
-// TODO: move to config
-// TODO: create nonote init command
-// Replate code/node-notes with path from config
-
 function getConfig() {
   var config = process.env['HOME'] + '/.nonoterc.json';
   // TODO: handle the case of `nonote new` when `nonote init` has not been run
   return fs.readJsonSync(config).notesDirectory;
 }
 
+function createDir(create, path) {
+  if (create) {
+    console.log('Aight, making a notes directory for ya :)');
+    console.log(path);
+    // fs.mkdirsSync(path);
+  } else {
+    console.log('Awesome, make sure that dir exsists!');
+  }
+}
 function initializeNotes(userDir) {
   // create .nonoterc
   var rcFile = process.env['HOME'] + '/.nonoterc.json';
@@ -30,11 +32,17 @@ function initializeNotes(userDir) {
   dotFileJSON.notesDirectory = userDir;
 
   fs.writeJsonSync(rcFile, dotFileJSON);
-
-  return console.log(rcFile);
+  console.log(' ');
+  console.log(chalk.yellow('Success!') + ' Config file `.nonoterc.json` created:' );
+  console.log(chalk.cyan(rcFile));
+  console.log(' ');
+  console.log(chalk.cyan('nonote new') + ' will create a new note in this directory: ')
+  console.log(chalk.blue.inverse(dotFileJSON.notesDirectory));
+  console.log(' ');
 }
 
 function getDir(type) {
+  var today = moment().format("DD-MM-YYYY");
   var notesDir = getConfig();
   var days = notesDir + '/days/';
   var toDir = days + today;
@@ -177,6 +185,7 @@ program
   .alias('n')
   .description('create a new note for the day')
   .action(function(template, cmd) {
+    var today = moment().format("DD-MM-YYYY");
     var dir = getDir();
     var toData = dir + '/data.json';
     var dataJSON = fs.readJsonSync(toData);
@@ -205,9 +214,13 @@ program
   .action(function(cmd) {
     cmdValue = cmd;
     co(function *() {
-      var notesDirPath = yield prompt('notes directory path: ');
-      initializeNotes(notesDirPath);
-      console.log(chalk.green('Great choice! ' + chalk.red(notesDirPath) + ' is where new notes will be added :)'));
+
+      var notesDirPath = yield prompt('notes directory path (from HOME): ');
+      var homePath = process.env['HOME'] + '/' + notesDirPath;
+      initializeNotes(homePath);
+
+      var shouldCreate = yield prompt.confirm('Would you like me to create "' + homePath + '" for you? [y/N] ');
+      createDir(shouldCreate, homePath);
       process.exit();
     })
   });
