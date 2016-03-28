@@ -7,15 +7,64 @@ var fs = require('fs-extra');
 var moment = require('moment');
 var co = require('co');
 var prompt = require('co-prompt');
-var getConfig = require('./utils').getConfig;
-var createDir = require('./utils').createDir;
-var initializeNotes = require('./utils').initializeNotes;
-var getDir = require('./utils').getDir;
+// var getConfig = require('./utils').getConfig;
+// var createDir = require('./utils').createDir;
+// var initializeNotes = require('./utils').initializeNotes;
+// var getDir = require('./utils').getDir;
 var makeNote = require('./utils').makeNote;
 var addNote = require('./utils').addNote;
 var removeNote = require('./utils').removeNote;
 var completeNote = require('./utils').completeNote;
 var incompleteNote = require('./utils').incompleteNote;
+var templateJSON = require('./templates/default.json');
+
+function initializeNotes(userDir) {
+  console.log(chalk.green('Success!'));
+  var rcFile = process.env['HOME'] + '/.nonoterc.json';
+  fs.closeSync(fs.openSync(rcFile, 'w'));
+
+  var dotFileJSON = {}
+  dotFileJSON.notesDirectory = userDir;
+
+  fs.writeJsonSync(rcFile, dotFileJSON);
+  console.log(' ');
+  console.log(chalk.green('Success!'));
+  console.log(' ');
+  console.log('dotfile `.nonoterc.json` created at $HOME' );
+  console.log(' ');
+  console.log('Notes will be made in this directory: ')
+  console.log(chalk.cyan(dotFileJSON.notesDirectory));
+  console.log(' ');
+}
+function getConfig() {
+  var config = process.env['HOME'] + '/.nonoterc.json';
+  // TODO: handle the case of `nonote new` when `nonote init` has not been run
+  return fs.readJsonSync(config).notesDirectory;
+}
+
+function getDir(type) {
+  var today = moment().format("DD-MM-YYYY");
+  var notesDir = getConfig();
+  var days = notesDir + '/days/';
+  var toDir = days + today;
+  return toDir;
+}
+
+function createDir(create, path) {
+  var templateDest = path + '/templates/';
+  var templateFile = path + '/templates/default.json';
+  if (create) {
+    fs.mkdirsSync(path);
+    fs.mkdirsSync(templateDest);
+    fs.closeSync(fs.openSync(templateFile, 'w'));
+    fs.writeJsonSync(templateFile, templateJSON);
+    console.log(' ');
+    console.log(chalk.green('Success!'));
+  } else {
+    console.log(' ');
+    console.log('Make sure that dir exists and has a templates dir in it with a note config!');
+  }
+}
 
 
 program
@@ -24,27 +73,24 @@ program
   .alias('n')
   .description('create a new note for the day')
   .action(function(template, cmd) {
-    var today = moment().format("DD-MM-YYYY");
-    var dir = getDir();
-    var toData = dir + '/data.json';
-    var dataJSON = fs.readJsonSync(toData);
-    var configJSON = fs.readJsonSync(getConfig());
-    // read template in
-    // get object template of proper name
-    // if can't find, get first in templates object
-    // var template = Object.keys(configJSON).map(function(key){
-    //   if (key === templateValue){
-    //     return
-    //   }
-    // });
+    // var today = moment().format("DD-MM-YYYY");
+    // var dir = getConfig();
+    // var toData = dir + '/data.json';
+    // var dataJSON = fs.readJsonSync(toData);
+    // var configJSON = fs.readJsonSync(getConfig());
+    // // read template in
+    // // get object template of proper name
+    // // if can't find use default
 
-    console.log(chalk.cyan('creating new note for today!'));
+    // var createTemplate = template || '/default.json'
 
-    fs.mkdirsSync(dir);
-    fs.copySync(template, toData);
-    makeNote(dataJSON);
+    // console.log(chalk.cyan('creating new note for today!'));
 
-    console.log(chalk.white('new note created for: ') + chalk.bold.green(today));
+    // fs.mkdirsSync(dir);
+    // fs.copySync(template, toData);
+    // makeNote(dataJSON);
+
+    // console.log(chalk.white('new note created for: ') + chalk.bold.green(today));
   });
 
 program
@@ -58,7 +104,7 @@ program
       var homePath = process.env['HOME'] + '/' + notesDirPath;
       initializeNotes(homePath);
 
-      var shouldCreate = yield prompt.confirm('Would you like me to create "' + homePath + '" for you? [y/N] ');
+      var shouldCreate = yield prompt.confirm('Would you like me to create "' + homePath + '" for you?(Recommended) [y/N] ');
       createDir(shouldCreate, homePath);
       console.log('Start taking notes with ' + chalk.cyan('nonote new!'));
       process.exit();

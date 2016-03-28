@@ -3,6 +3,7 @@
 var fs = require('fs-extra');
 var chalk = require('chalk');
 var moment = require('moment');
+// var template = require('./templates/default.json');
 
 function getConfig() {
   var config = process.env['HOME'] + '/.nonoterc.json';
@@ -19,17 +20,21 @@ function getDir(type) {
 }
 
 function createDir(create, path) {
+  var tempDest = path + '/templates/';
   if (create) {
     fs.mkdirsSync(path);
+    fs.mkdirsSync(tempDest);
+    fs.copySync(template, tempDest);
     console.log(' ');
     console.log(chalk.green('Success!'));
   } else {
     console.log(' ');
-    console.log('Awesome, make sure that dir exsists!');
+    console.log('Make sure that dir exists and has a templates dir in it with a note config!');
   }
 }
 
 function initializeNotes(userDir) {
+  console.log(chalk.green('Success!'));
   var rcFile = process.env['HOME'] + '/.nonoterc.json';
   fs.closeSync(fs.openSync(rcFile, 'w'));
 
