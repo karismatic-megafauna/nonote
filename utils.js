@@ -3,54 +3,6 @@
 var fs = require('fs-extra');
 var chalk = require('chalk');
 var moment = require('moment');
-// var template = require('./templates/default.json');
-
-function getConfig() {
-  var config = process.env['HOME'] + '/.nonoterc.json';
-  // TODO: handle the case of `nonote new` when `nonote init` has not been run
-  return fs.readJsonSync(config).notesDirectory;
-}
-
-function getDir(type) {
-  var today = moment().format("DD-MM-YYYY");
-  var notesDir = getConfig();
-  var days = notesDir + '/days/';
-  var toDir = days + today;
-  return toDir;
-}
-
-function createDir(create, path) {
-  var tempDest = path + '/templates/';
-  if (create) {
-    fs.mkdirsSync(path);
-    fs.mkdirsSync(tempDest);
-    fs.copySync(template, tempDest);
-    console.log(' ');
-    console.log(chalk.green('Success!'));
-  } else {
-    console.log(' ');
-    console.log('Make sure that dir exists and has a templates dir in it with a note config!');
-  }
-}
-
-function initializeNotes(userDir) {
-  console.log(chalk.green('Success!'));
-  var rcFile = process.env['HOME'] + '/.nonoterc.json';
-  fs.closeSync(fs.openSync(rcFile, 'w'));
-
-  var dotFileJSON = {}
-  dotFileJSON.notesDirectory = userDir;
-
-  fs.writeJsonSync(rcFile, dotFileJSON);
-  console.log(' ');
-  console.log(chalk.green('Success!'));
-  console.log(' ');
-  console.log('dotfile `.nonoterc.json` created at $HOME' );
-  console.log(' ');
-  console.log('Notes will be made in this directory: ')
-  console.log(chalk.cyan(dotFileJSON.notesDirectory));
-  console.log(' ');
-}
 
 // TODO: think about changing these status functions to a single type
 // signiture -> changeStatus(index, key, newStatus)
@@ -186,7 +138,7 @@ module.exports = removeNote;
 module.exports = completeNote;
 module.exports = incompleteNote;
 module.exports = failNote;
-module.exports = getDir;
-module.exports = initializeNotes;
-module.exports = getConfig;
-module.exports = createDir;
+// module.exports = getDir;
+// module.exports = initializeNotes;
+// module.exports = getConfig;
+// module.exports = createDir;
