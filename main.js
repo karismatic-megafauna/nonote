@@ -16,10 +16,7 @@ function getConfig() {
 
 function createDir(create, path) {
   if (create) {
-    console.log(' ');
-    console.log('Aight, making a notes directory for ya at this location:');
-    console.log(path);
-    // fs.mkdirsSync(path);
+    fs.mkdirsSync(path);
     console.log(' ');
     console.log(chalk.green('Success!'));
   } else {
@@ -28,7 +25,6 @@ function createDir(create, path) {
   }
 }
 function initializeNotes(userDir) {
-  // create .nonoterc
   var rcFile = process.env['HOME'] + '/.nonoterc.json';
   fs.closeSync(fs.openSync(rcFile, 'w'));
 
@@ -39,11 +35,10 @@ function initializeNotes(userDir) {
   console.log(' ');
   console.log(chalk.green('Success!'));
   console.log(' ');
-  console.log('Config file `.nonoterc.json` created:' );
-  console.log(chalk.cyan(rcFile));
+  console.log('dotfile `.nonoterc.json` created at $HOME' );
   console.log(' ');
-  console.log(chalk.cyan('nonote new') + ' will create a new note in this directory: ')
-  console.log(chalk.yellow(dotFileJSON.notesDirectory));
+  console.log('Notes will be made in this directory: ')
+  console.log(chalk.cyan(dotFileJSON.notesDirectory));
   console.log(' ');
 }
 
