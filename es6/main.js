@@ -4,6 +4,7 @@ install();
 import 'babel-polyfill';
 /* eslint-disable */
 // Libs
+console.log('sup');
 var chalk = require('chalk');
 var program = require('commander');
 var fs = require('fs-extra');
