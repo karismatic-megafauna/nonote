@@ -1,3 +1,7 @@
+import {install} from 'source-map-support';
+install();
+
+import 'babel-polyfill';
 /* eslint-disable */
 // Libs
 var chalk = require('chalk');
