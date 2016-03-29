@@ -1,4 +1,4 @@
-import {install} from 'source-map-support';
+import { install } from 'source-map-support';
 install();
 
 import 'babel-polyfill';
@@ -11,7 +11,7 @@ var moment = require('moment');
 var co = require('co');
 var prompt = require('co-prompt');
 
-var templateJSON = require('./templates/default.json');
+var templateJSON = require('../templates/default.json');
 // TODO: think about changing these status functions to a single type
 // signiture -> changeStatus(index, key, newStatus)
 // would this be a case for currying? or some other functional tecq?
