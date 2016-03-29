@@ -6,15 +6,14 @@ install();
 import 'babel-polyfill';
 /* eslint-disable */
 // Libs
-console.log('sup');
-var chalk = require('chalk');
-var program = require('commander');
-var fs = require('fs-extra');
-var moment = require('moment');
-var co = require('co');
-var prompt = require('co-prompt');
+import chalk from 'chalk';
+import program from 'commander';
+import fs from 'fs-extra';
+import moment from 'moment';
+import co from 'co';
+import prompt from 'co-prompt';
+import templateJSON from '../templates/default.json';
 
-var templateJSON = require('../templates/default.json');
 // TODO: think about changing these status functions to a single type
 // signiture -> changeStatus(index, key, newStatus)
 // would this be a case for currying? or some other functional tecq?
