@@ -7,17 +7,135 @@ var fs = require('fs-extra');
 var moment = require('moment');
 var co = require('co');
 var prompt = require('co-prompt');
-// var getConfig = require('./utils').getConfig;
-// var createDir = require('./utils').createDir;
-// var initializeNotes = require('./utils').initializeNotes;
-// var getDir = require('./utils').getDir;
-var makeNote = require('./utils').makeNote;
-var addNote = require('./utils').addNote;
-var removeNote = require('./utils').removeNote;
-var completeNote = require('./utils').completeNote;
-var incompleteNote = require('./utils').incompleteNote;
-var templateJSON = require('./templates/default.json');
 
+var templateJSON = require('./templates/default.json');
+// TODO: think about changing these status functions to a single type
+// signiture -> changeStatus(index, key, newStatus)
+// would this be a case for currying? or some other functional tecq?
+
+function makeNote(jsonObj) {
+  var dir = getDir();
+  var toMd = dir + '/note.md';
+  var noteMd = fs.createWriteStream(toMd);
+  Object.keys(jsonObj).map(function(title) {
+    noteMd.write("# " + title + "\n");
+    Object.keys(jsonObj[title]['items']).map(function(items, index){
+      var status = jsonObj[title]['items'][items]['status'];
+      var checkBox = '- [ ]';
+      var itemIndex = ' ' + index + '.) ';
+      if (status === 'complete') {
+        checkBox = '- [x]';
+      } else if (status === 'failed') {
+        checkBox = '- [-]';
+      }
+      noteMd.write(checkBox + itemIndex + jsonObj[title]['items'][items]['description'] + "\n");
+    });
+    noteMd.write("\n");
+  });
+}
+
+function addNote(noteObj, key) {
+  var dir = getDir();
+  var toData = dir + '/data.json';
+  var dataJSON = fs.readJsonSync(toData);
+  var noteString = noteObj.reduce(function(memo, word){
+    return memo + ' ' + word;
+  });
+
+  var descriptionObj = {
+    description: noteString,
+    status: 'incomplete',
+  };
+
+  // modify toData
+  Object.keys(dataJSON).map(function(note){
+    if (dataJSON[note]['cli-ref'] === key) {
+      dataJSON[note]['items'].push(descriptionObj);
+      fs.writeJsonSync(toData, dataJSON);
+    }
+  });
+  makeNote(dataJSON);
+}
+
+function removeNote(index, key) {
+  var dir = getDir();
+  var toData = dir + '/data.json';
+  var dataJSON = fs.readJsonSync(dir + '/data.json');
+  var cliFound = false;
+  Object.keys(dataJSON).map(function(note, noteIndex){
+    if (dataJSON[note]['cli-ref'] === key) {
+      cliFound = true;
+      if (!dataJSON[note]['items'][index]) {
+        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+      }
+      dataJSON[note]['items'].splice(index, 1);
+      fs.writeJsonSync(toData, dataJSON);
+    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
+      throw new Error('"' + key + '" <cli-ref> does not exist');
+    }
+  });
+  makeNote(dataJSON);
+}
+
+function completeNote(index, key) {
+  var dir = getDir();
+  var toData = dir + '/data.json';
+  var dataJSON = fs.readJsonSync(toData);
+  var cliFound = false;
+  Object.keys(dataJSON).map(function(note, noteIndex) {
+    if (dataJSON[note]['cli-ref'] === key) {
+      cliFound = true;
+      if (!dataJSON[note]['items'][index]) {
+        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+      }
+      dataJSON[note]['items'][index]['status'] = 'complete';
+      fs.writeJsonSync(toData, dataJSON);
+    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
+      throw new Error('"' + key + '" <cli-ref> does not exist');
+    }
+  });
+  makeNote(dataJSON);
+}
+
+function incompleteNote(index, key) {
+  var dir = getDir();
+  var toData = dir + '/data.json';
+  var dataJSON = fs.readJsonSync(toData);
+  var cliFound = false;
+  Object.keys(dataJSON).map(function(note, noteIndex) {
+    if (dataJSON[note]['cli-ref'] === key) {
+      cliFound = true;
+      if (!dataJSON[note]['items'][index]) {
+        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+      }
+      dataJSON[note]['items'][index]['status'] = 'incomplete';
+      fs.writeJsonSync(toData, dataJSON);
+    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
+      throw new Error('"' + key + '" <cli-ref> does not exist');
+    }
+  });
+  makeNote(dataJSON);
+}
+
+function failNote(index, key) {
+  var dir = getDir();
+  var toData = dir + '/data.json';
+  var dataJSON = fs.readJsonSync(toData);
+  var cliFound = false;
+  Object.keys(dataJSON).map(function(note, noteIndex) {
+    if (dataJSON[note]['cli-ref'] === key) {
+      cliFound = true;
+      if (!dataJSON[note]['items'][index]) {
+        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+      }
+      dataJSON[note]['items'][index]['status'] = 'failed';
+      fs.writeJsonSync(toData, dataJSON);
+      return makeNote(dataJSON);
+    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
+      throw new Error('"' + key + '" <cli-ref> does not exist');
+    }
+  });
+}
 function initializeNotes(userDir) {
   console.log(chalk.green('Success!'));
   var rcFile = process.env['HOME'] + '/.nonoterc.json';
@@ -73,24 +191,22 @@ program
   .alias('n')
   .description('create a new note for the day')
   .action(function(template, cmd) {
-    // var today = moment().format("DD-MM-YYYY");
-    // var dir = getConfig();
-    // var toData = dir + '/data.json';
-    // var dataJSON = fs.readJsonSync(toData);
-    // var configJSON = fs.readJsonSync(getConfig());
-    // // read template in
-    // // get object template of proper name
-    // // if can't find use default
+    if(!template) {
+      template = 'default';
+    }
+    var today = moment().format("DD-MM-YYYY");
+    var dir = getConfig() + '/';
+    var notePath = dir + today;
+    var templateData = dir + 'templates/' + template + '.json';
 
-    // var createTemplate = template || '/default.json'
+    console.log('notePath:', notePath);
+    console.log(chalk.cyan('creating new note for today!'));
 
-    // console.log(chalk.cyan('creating new note for today!'));
-
-    // fs.mkdirsSync(dir);
-    // fs.copySync(template, toData);
+    // fs.mkdirsSync(notePath);
+    // fs.copySync(templateData, noteData);
     // makeNote(dataJSON);
 
-    // console.log(chalk.white('new note created for: ') + chalk.bold.green(today));
+    console.log(chalk.white('new note created for: ') + chalk.bold.green(today));
   });
 
 program
@@ -107,6 +223,7 @@ program
       var shouldCreate = yield prompt.confirm('Would you like me to create "' + homePath + '" for you?(Recommended) [y/N] ');
       createDir(shouldCreate, homePath);
       console.log('Start taking notes with ' + chalk.cyan('nonote new!'));
+      // TODO: create a readme
       process.exit();
     })
   });
