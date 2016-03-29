@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { install } from 'source-map-support';
 install();
 
@@ -216,8 +218,7 @@ program
 program
   .command('init')
   .description('initializes notes')
-  .action(function(cmd) {
-    cmdValue = cmd;
+  .action(function() {
     co(function *() {
 
       var notesDirPath = yield prompt('notes directory path (from $HOME): ');
