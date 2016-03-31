@@ -18,6 +18,7 @@ import templateJSON from '../templates/default.json';
 // signiture -> changeStatus(index, key, newStatus)
 // would this be a case for currying? or some other functional tecq?
 
+
 function makeNote(jsonObj) {
   var dir = getDir();
   var toMd = dir + '/note.md';
@@ -62,7 +63,7 @@ function addNote(noteObj, key) {
   makeNote(dataJSON);
 }
 
-function removeNote(index, key) {
+function changeStatus(index, key, cb) {
   var dir = getDir();
   var toData = dir + '/data.json';
   var dataJSON = fs.readJsonSync(dir + '/data.json');
@@ -73,7 +74,7 @@ function removeNote(index, key) {
       if (!dataJSON[note]['items'][index]) {
         throw new Error(`index ${index} in "${key}" object does not exist`);
       }
-      dataJSON[note]['items'].splice(index, 1);
+      cb(dataJSON[note]['items'], index);
       fs.writeJsonSync(toData, dataJSON);
     } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
       throw new Error(`"${key}" <cli-ref> does not exist`);
@@ -82,65 +83,22 @@ function removeNote(index, key) {
   makeNote(dataJSON);
 }
 
-function completeNote(index, key) {
-  var dir = getDir();
-  var toData = dir + '/data.json';
-  var dataJSON = fs.readJsonSync(toData);
-  var cliFound = false;
-  Object.keys(dataJSON).map(function(note, noteIndex) {
-    if (dataJSON[note]['cli-ref'] === key) {
-      cliFound = true;
-      if (!dataJSON[note]['items'][index]) {
-        throw new Error(`index ${index} in "${key}" object does not exist`);
-      }
-      dataJSON[note]['items'][index]['status'] = 'complete';
-      fs.writeJsonSync(toData, dataJSON);
-    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error(`"${key}" <cli-ref> does not exist`);
-    }
-  });
-  makeNote(dataJSON);
+function removeNote(arry, index) {
+  arry.splice(index, 1);
 }
 
-function incompleteNote(index, key) {
-  var dir = getDir();
-  var toData = dir + '/data.json';
-  var dataJSON = fs.readJsonSync(toData);
-  var cliFound = false;
-  Object.keys(dataJSON).map(function(note, noteIndex) {
-    if (dataJSON[note]['cli-ref'] === key) {
-      cliFound = true;
-      if (!dataJSON[note]['items'][index]) {
-        throw new Error(`index ${index} in "${key}" object does not exist`);
-      }
-      dataJSON[note]['items'][index]['status'] = 'incomplete';
-      fs.writeJsonSync(toData, dataJSON);
-    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error(`"${key}" <cli-ref> does not exist`);
-    }
-  });
-  makeNote(dataJSON);
+function completeNote(arry, index) {
+  arry[index]['status'] = 'complete';
 }
 
-function failNote(index, key) {
-  var dir = getDir();
-  var toData = dir + '/data.json';
-  var dataJSON = fs.readJsonSync(toData);
-  var cliFound = false;
-  Object.keys(dataJSON).map(function(note, noteIndex) {
-    if (dataJSON[note]['cli-ref'] === key) {
-      cliFound = true;
-      if (!dataJSON[note]['items'][index]) {
-        throw new Error(`index ${index} in "${key}" object does not exist`);
-      }
-      dataJSON[note]['items'][index]['status'] = 'failed';
-      fs.writeJsonSync(toData, dataJSON);
-      return makeNote(dataJSON);
-    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error(`"${key}" <cli-ref> does not exist`);
-    }
-  });
+function incompleteNote(arry, index) {
+  arry[index]['status'] = 'incomplete';
 }
+
+function failNote(arry, index) {
+  arry[index]['status'] = 'failed';
+}
+
 function initializeNotes(userDir) {
   console.log(chalk.green('Success!'));
   var rcFile = process.env['HOME'] + '/.nonoterc.json';
@@ -251,7 +209,7 @@ program
   .description('remove note from note object')
   .action(function(ref, note, cmd) {
     try {
-      removeNote(note, ref);
+      changeStatus(note, ref, removeNote);
       console.log(chalk.green('note at index[' + note + '] was removed!'));
     } catch (e) {
       console.log(chalk.red(e));
@@ -264,7 +222,7 @@ program
   .description('mark item as complete')
   .action(function(ref, note, cmd) {
     try {
-      completeNote(note, ref);
+      changeStatus(note, ref, completeNote);
       console.log(chalk.green('note at index[' + note + '] was marked as complete!'));
     } catch (e) {
       console.log(chalk.red(e));
@@ -277,7 +235,7 @@ program
   .description('mark item as incomplete')
   .action(function(ref, note, cmd) {
     try {
-      incompleteNote(note, ref);
+      changeStatus(note, ref, incompleteNote);
       console.log(chalk.green('note at index[' + note + '] was marked as incomplete!'));
     } catch (e) {
       console.log(chalk.red(e));
@@ -290,7 +248,7 @@ program
   .description('mark item as failed')
   .action(function(ref, note, cmd) {
     try {
-      failNote(note, ref);
+      changeStatus(note, ref, failNote);
       console.log(chalk.green('note at index[' + note + '] was marked as failed :('));
     } catch (e) {
       console.log(chalk.red(e));
