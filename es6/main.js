@@ -23,11 +23,11 @@ function makeNote(jsonObj) {
   var toMd = dir + '/note.md';
   var noteMd = fs.createWriteStream(toMd);
   Object.keys(jsonObj).map(function(title) {
-    noteMd.write("# " + title + "\n");
+    noteMd.write(`#  ${title} \n`);
     Object.keys(jsonObj[title]['items']).map(function(items, index){
       var status = jsonObj[title]['items'][items]['status'];
       var checkBox = '- [ ]';
-      var itemIndex = ' ' + index + '.) ';
+      var itemIndex = ` ${index} .) `;
       if (status === 'complete') {
         checkBox = '- [x]';
       } else if (status === 'failed') {
@@ -71,12 +71,12 @@ function removeNote(index, key) {
     if (dataJSON[note]['cli-ref'] === key) {
       cliFound = true;
       if (!dataJSON[note]['items'][index]) {
-        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+        throw new Error(`index ${index} in "${key}" object does not exist`);
       }
       dataJSON[note]['items'].splice(index, 1);
       fs.writeJsonSync(toData, dataJSON);
     } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error('"' + key + '" <cli-ref> does not exist');
+      throw new Error(`"${key}" <cli-ref> does not exist`);
     }
   });
   makeNote(dataJSON);
@@ -91,12 +91,12 @@ function completeNote(index, key) {
     if (dataJSON[note]['cli-ref'] === key) {
       cliFound = true;
       if (!dataJSON[note]['items'][index]) {
-        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+        throw new Error(`index ${index} in "${key}" object does not exist`);
       }
       dataJSON[note]['items'][index]['status'] = 'complete';
       fs.writeJsonSync(toData, dataJSON);
     } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error('"' + key + '" <cli-ref> does not exist');
+      throw new Error(`"${key}" <cli-ref> does not exist`);
     }
   });
   makeNote(dataJSON);
@@ -111,12 +111,12 @@ function incompleteNote(index, key) {
     if (dataJSON[note]['cli-ref'] === key) {
       cliFound = true;
       if (!dataJSON[note]['items'][index]) {
-        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+        throw new Error(`index ${index} in "${key}" object does not exist`);
       }
       dataJSON[note]['items'][index]['status'] = 'incomplete';
       fs.writeJsonSync(toData, dataJSON);
     } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error('"' + key + '" <cli-ref> does not exist');
+      throw new Error(`"${key}" <cli-ref> does not exist`);
     }
   });
   makeNote(dataJSON);
@@ -131,13 +131,13 @@ function failNote(index, key) {
     if (dataJSON[note]['cli-ref'] === key) {
       cliFound = true;
       if (!dataJSON[note]['items'][index]) {
-        throw new Error('index ' + index + ' in "' + key + '" object does not exist');
+        throw new Error(`index ${index} in "${key}" object does not exist`);
       }
       dataJSON[note]['items'][index]['status'] = 'failed';
       fs.writeJsonSync(toData, dataJSON);
       return makeNote(dataJSON);
     } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error('"' + key + '" <cli-ref> does not exist');
+      throw new Error(`"${key}" <cli-ref> does not exist`);
     }
   });
 }
@@ -200,9 +200,9 @@ program
       template = 'default';
     }
     var today = moment().format("DD-MM-YYYY");
-    var dir = getConfig() + '/';
+    var dir = getConfig()
     var notePath = dir + today;
-    var templateData = dir + 'templates/' + template + '.json';
+    var templateData = `${dir}/templates/${template}.json`;
 
     console.log('notePath:', notePath);
     console.log(chalk.cyan('creating new note for today!'));
