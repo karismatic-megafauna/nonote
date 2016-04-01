@@ -96,6 +96,14 @@ function failNote(arry, index) {
 }
 
 function initializeNotes(userDir) {
+  // TODO: if you create a note with out a `/` trailing slash
+  // "/Users/georgemichael/notes/"
+  //  vs.
+  // "/Users/georgemichael/notes"
+
+  // the latter will get us in trouble with `nonote new`
+  // need to ensure one or the other at init and create time
+
   var rcFile = `${process.env.HOME}/.nonoterc.json`;
   fs.closeSync(fs.openSync(rcFile, 'w'));
 
@@ -153,7 +161,7 @@ program
     var notePath = getDateDir();
     var noteJSON = `${notePath}/data.json`;
     var rootDir = getRootDir();
-    var templateData = `${rootDir}templates/${template}.json`;
+    var templateData = `${rootDir}/templates/${template}.json`;
 
     console.log(chalk.cyan(`creating new note from the ${template} template!`));
 
