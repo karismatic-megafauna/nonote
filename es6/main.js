@@ -4,7 +4,6 @@ import { install } from 'source-map-support';
 install();
 
 import 'babel-polyfill';
-/* eslint-disable */
 // Libs
 import chalk from 'chalk';
 import program from 'commander';
@@ -13,11 +12,6 @@ import moment from 'moment';
 import co from 'co';
 import prompt from 'co-prompt';
 import templateJSON from '../templates/default.json';
-
-// TODO: think about changing these status functions to a single type
-// signiture -> changeStatus(index, key, newStatus)
-// would this be a case for currying? or some other functional tecq?
-
 
 function makeNote(jsonObj) {
   var dir = getDir();
@@ -100,7 +94,6 @@ function failNote(arry, index) {
 }
 
 function initializeNotes(userDir) {
-  console.log(chalk.green('Success!'));
   var rcFile = process.env['HOME'] + '/.nonoterc.json';
   fs.closeSync(fs.openSync(rcFile, 'w'));
 
@@ -108,7 +101,6 @@ function initializeNotes(userDir) {
   dotFileJSON.notesDirectory = userDir;
 
   fs.writeJsonSync(rcFile, dotFileJSON);
-  console.log(' ');
   console.log(chalk.green('Success!'));
   console.log(' ');
   console.log('dotfile `.nonoterc.json` created at $HOME' );
@@ -147,7 +139,6 @@ function createDir(create, path) {
   }
 }
 
-
 program
   .version('0.0.1')
   .command('new [template]')
@@ -182,9 +173,9 @@ program
       var homePath = process.env['HOME'] + '/' + notesDirPath;
       initializeNotes(homePath);
 
-      var shouldCreate = yield prompt.confirm('Would you like me to create "' + homePath + '" for you?(Recommended) [y/N] ');
+      var shouldCreate = yield prompt.confirm(`Would you like me to create "${homePath}" for you?(Recommended) [y/N] `);
       createDir(shouldCreate, homePath);
-      console.log('Start taking notes with ' + chalk.cyan('nonote new!'));
+      console.log('Start taking notes with', chalk.cyan('nonote new!'));
       // TODO: create a readme
       process.exit();
     })
@@ -210,7 +201,7 @@ program
   .action(function(ref, note, cmd) {
     try {
       changeStatus(note, ref, removeNote);
-      console.log(chalk.green('note at index[' + note + '] was removed!'));
+      console.log(chalk.green(`note at index[${note}] was removed!`));
     } catch (e) {
       console.log(chalk.red(e));
     }
@@ -223,7 +214,7 @@ program
   .action(function(ref, note, cmd) {
     try {
       changeStatus(note, ref, completeNote);
-      console.log(chalk.green('note at index[' + note + '] was marked as complete!'));
+      console.log(chalk.green(`note at index[${note}] was marked as complete!`));
     } catch (e) {
       console.log(chalk.red(e));
     }
@@ -236,7 +227,7 @@ program
   .action(function(ref, note, cmd) {
     try {
       changeStatus(note, ref, incompleteNote);
-      console.log(chalk.green('note at index[' + note + '] was marked as incomplete!'));
+      console.log(chalk.green(`note at index[${note}] was marked as incomplete!`));
     } catch (e) {
       console.log(chalk.red(e));
     }
@@ -249,7 +240,7 @@ program
   .action(function(ref, note, cmd) {
     try {
       changeStatus(note, ref, failNote);
-      console.log(chalk.green('note at index[' + note + '] was marked as failed :('));
+      console.log(chalk.green(`note at index[${note}] was marked as failed :(`));
     } catch (e) {
       console.log(chalk.red(e));
     }
@@ -257,4 +248,3 @@ program
 
   program.parse(process.argv);
 
-  /* eslint-enable*/
