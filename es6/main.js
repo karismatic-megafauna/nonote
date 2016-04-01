@@ -14,11 +14,12 @@ import prompt from 'co-prompt';
 import templateJSON from '../templates/default.json';
 
 function makeNote(jsonObj) {
-  var dir = getDir();
+  var dir = getDateDir();
   var toMd = dir + '/note.md';
   var noteMd = fs.createWriteStream(toMd);
+  console.log(jsonObj);
   Object.keys(jsonObj).map(function(title) {
-    noteMd.write(`#  ${title} \n`);
+    noteMd.write('hi');
     Object.keys(jsonObj[title]['items']).map(function(items, index){
       var status = jsonObj[title]['items'][items]['status'];
       var checkBox = '- [ ]';
@@ -32,10 +33,11 @@ function makeNote(jsonObj) {
     });
     noteMd.write("\n");
   });
+  noteMd.end();
 }
 
 function addNote(noteObj, key) {
-  var dir = getDir();
+  var dir = getDateDir();
   var toData = `${dir}/data.json`;
   var dataJSON = fs.readJsonSync(toData);
   var noteString = noteObj.reduce(function(memo, word){
@@ -58,7 +60,7 @@ function addNote(noteObj, key) {
 }
 
 function changeStatus(index, key, cb) {
-  var dir = getDir();
+  var dir = getDateDir();
   var toData = `${dir}/data.json`;
   var dataJSON = fs.readJsonSync(`${dir}/data.json`);
   var cliFound = false;
@@ -109,16 +111,16 @@ function initializeNotes(userDir) {
   console.log(chalk.cyan(dotFileJSON.notesDirectory));
   console.log(' ');
 }
-function getConfig() {
+function getRootDir() {
   var config = `${process.env.HOME}/.nonoterc.json`;
   // TODO: handle the case of `nonote new` when `nonote init` has not been run
   return fs.readJsonSync(config).notesDirectory;
 }
 
-function getDir(type) {
+function getDateDir(type) {
   var today = moment().format("DD-MM-YYYY");
-  var notesDir = getConfig();
-  var days = `${notesDir}/days/`;
+  var notesDir = getRootDir();
+  var days = `${notesDir}days/`;
   var toDir = days + today;
   return toDir;
 }
@@ -148,19 +150,19 @@ program
     if(!template) {
       template = 'default';
     }
-    var today = moment().format("DD-MM-YYYY");
-    var dir = getConfig()
-    var notePath = dir + today;
-    var templateData = `${dir}/templates/${template}.json`;
+    var notePath = getDateDir();
+    var noteJSON = `${notePath}/data.json`;
+    var rootDir = getRootDir();
+    var templateData = `${rootDir}/templates/${template}.json`;
 
-    console.log('notePath:', notePath);
     console.log(chalk.cyan('creating new note for today!'));
 
-    // fs.mkdirsSync(notePath);
-    // fs.copySync(templateData, noteData);
-    // makeNote(dataJSON);
+    fs.mkdirsSync(notePath);
+    fs.copySync(templateData, noteJSON);
+    console.log(noteJSON);
+    makeNote(noteJSON);
 
-    console.log(chalk.white('new note created for: ') + chalk.bold.green(today));
+    console.log(chalk.white('new note created'));
   });
 
 program
