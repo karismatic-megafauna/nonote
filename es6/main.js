@@ -15,15 +15,15 @@ import templateJSON from '../templates/default.json';
 
 function makeNote(jsonObj) {
   var dir = getDateDir();
-  var toMd = dir + '/note.md';
+  var toMd = `${dir}/note.md`;
   var noteMd = fs.createWriteStream(toMd);
-  console.log(jsonObj);
+
   Object.keys(jsonObj).map(function(title) {
-    noteMd.write('hi');
+    noteMd.write("# " + title + "\n");
     Object.keys(jsonObj[title]['items']).map(function(items, index){
       var status = jsonObj[title]['items'][items]['status'];
       var checkBox = '- [ ]';
-      var itemIndex = ` ${index} .) `;
+      var itemIndex = ` ${index}.) `;
       if (status === 'complete') {
         checkBox = '- [x]';
       } else if (status === 'failed') {
@@ -33,7 +33,7 @@ function makeNote(jsonObj) {
     });
     noteMd.write("\n");
   });
-  noteMd.end();
+  // console.log(`note for ${dir} modified!`);
 }
 
 function addNote(noteObj, key) {
@@ -153,14 +153,13 @@ program
     var notePath = getDateDir();
     var noteJSON = `${notePath}/data.json`;
     var rootDir = getRootDir();
-    var templateData = `${rootDir}/templates/${template}.json`;
+    var templateData = `${rootDir}templates/${template}.json`;
 
-    console.log(chalk.cyan('creating new note for today!'));
+    console.log(chalk.cyan(`creating new note from the ${template} template!`));
 
     fs.mkdirsSync(notePath);
     fs.copySync(templateData, noteJSON);
-    console.log(noteJSON);
-    makeNote(noteJSON);
+    makeNote(fs.readJsonSync(noteJSON));
 
     console.log(chalk.white('new note created'));
   });
