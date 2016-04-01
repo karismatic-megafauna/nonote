@@ -22,7 +22,7 @@
     "notes",
     "cli"
   ],
-  "author": "Michael George Hinrichs",
+  "author": "Michael Hinrichs",
   "license": "ISC",
   "bin": {
     "nonote": "./es5/main.js",
