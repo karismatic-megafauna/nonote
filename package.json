@@ -1,7 +1,7 @@
 {
   "name": "nonote",
   "version": "1.0.0",
-  "description": "a node application for taking notes",
+  "description": "a node application for taking notes in markdown",
   "main": "main.js",
   "scripts": {
     "build": "babel es6 --out-dir es5 --source-maps",
@@ -29,7 +29,7 @@
     "nono": "./es5/main.js"
   },
   "bugs": {
-    "url": "https://github.com/michaelghinrichs/node-notes/issues"
+    "url": "https://github.com/michaelghinrichs/nonote/issues"
   },
   "homepage": "https://github.com/michaelghinrichs/nonote#readme",
   "dependencies": {
