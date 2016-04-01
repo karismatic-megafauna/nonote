@@ -36,7 +36,7 @@ function makeNote(jsonObj) {
 
 function addNote(noteObj, key) {
   var dir = getDir();
-  var toData = dir + '/data.json';
+  var toData = `${dir}/data.json`;
   var dataJSON = fs.readJsonSync(toData);
   var noteString = noteObj.reduce(function(memo, word){
     return memo + ' ' + word;
@@ -59,8 +59,8 @@ function addNote(noteObj, key) {
 
 function changeStatus(index, key, cb) {
   var dir = getDir();
-  var toData = dir + '/data.json';
-  var dataJSON = fs.readJsonSync(dir + '/data.json');
+  var toData = `${dir}/data.json`;
+  var dataJSON = fs.readJsonSync(`${dir}/data.json`);
   var cliFound = false;
   Object.keys(dataJSON).map(function(note, noteIndex){
     if (dataJSON[note]['cli-ref'] === key) {
@@ -94,7 +94,7 @@ function failNote(arry, index) {
 }
 
 function initializeNotes(userDir) {
-  var rcFile = process.env['HOME'] + '/.nonoterc.json';
+  var rcFile = `${process.env.HOME}/.nonoterc.json`;
   fs.closeSync(fs.openSync(rcFile, 'w'));
 
   var dotFileJSON = {}
@@ -110,7 +110,7 @@ function initializeNotes(userDir) {
   console.log(' ');
 }
 function getConfig() {
-  var config = process.env['HOME'] + '/.nonoterc.json';
+  var config = `${process.env.HOME}/.nonoterc.json`;
   // TODO: handle the case of `nonote new` when `nonote init` has not been run
   return fs.readJsonSync(config).notesDirectory;
 }
@@ -118,7 +118,7 @@ function getConfig() {
 function getDir(type) {
   var today = moment().format("DD-MM-YYYY");
   var notesDir = getConfig();
-  var days = notesDir + '/days/';
+  var days = `${notesDir}/days/`;
   var toDir = days + today;
   return toDir;
 }
@@ -170,7 +170,7 @@ program
     co(function *() {
 
       var notesDirPath = yield prompt('notes directory path (from $HOME): ');
-      var homePath = process.env['HOME'] + '/' + notesDirPath;
+      var homePath = `${process.env.HOME}/${notesDirPath}`;
       initializeNotes(homePath);
 
       var shouldCreate = yield prompt.confirm(`Would you like me to create "${homePath}" for you?(Recommended) [y/N] `);
