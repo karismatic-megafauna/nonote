@@ -1,6 +1,20 @@
 # nonote
-Personalized CLI note taking application in node
+Nonote is a Command Line Node application for taking notes in Git Hub flavored Markdown!
 
+It is really useful if you like staying in the terminal and want a place to write something down!
+
+A great paring of tools with nonote is: vim, tmux and `watch cat <note>.md`. I highly recommend all of these tools.
+
+
+## Installation
+When installing `nonote` make sure it is done with the -g flag as nonote is in
+intended to be used in this manner. No matter where you are you should be able
+to add a note!
+
+First step, initialize the tool!
+```sh
+$ nonote init
+```
 
 ## Usage
 ```sh
