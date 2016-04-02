@@ -1,7 +1,7 @@
 {
   "name": "nonote",
-  "version": "1.0.0",
-  "description": "a node application for taking notes in markdown",
+  "version": "1.0.1",
+  "description": "a node application for taking notes in markdown from the command line",
   "main": "main.js",
   "scripts": {
     "build": "babel es6 --out-dir es5 --source-maps",
