@@ -19,7 +19,8 @@ function makeNote(jsonObj) {
   var noteMd = fs.createWriteStream(toMd);
 
   Object.keys(jsonObj).map(function(title) {
-    noteMd.write("# " + title + "\n");
+    var cliRef = jsonObj[title]['cli-ref'];
+    noteMd.write(`# ${title} --> ${cliRef}\n`);
     Object.keys(jsonObj[title]['items']).map(function(items, index){
       var status = jsonObj[title]['items'][items]['status'];
       var checkBox = '- [ ]';
@@ -96,13 +97,15 @@ function failNote(arry, index) {
 }
 
 function initializeNotes(userDir) {
-  // TODO: if you create a note with out a `/` trailing slash
-  // "/Users/georgemichael/notes/"
-  //  vs.
-  // "/Users/georgemichael/notes"
+  var lastChar = userDir.substr(userDir.length - 1);
+  if ( lastChar === "/" ) {
+    userDir = userDir.slice(0, -1);
+  }
 
-  // the latter will get us in trouble with `nonote new`
-  // need to ensure one or the other at init and create time
+  var doubleIndex = userDir.indexOf("//");
+  if ( doubleIndex > -1 ) {
+    userDir = userDir.slice(0, doubleIndex) + userDir.slice(doubleIndex + 1);
+  }
 
   var rcFile = `${process.env.HOME}/.nonoterc.json`;
   fs.closeSync(fs.openSync(rcFile, 'w'));
@@ -128,7 +131,7 @@ function getRootDir() {
 function getDateDir(type) {
   var today = moment().format("DD-MM-YYYY");
   var notesDir = getRootDir();
-  var days = `${notesDir}days/`;
+  var days = `${notesDir}/days/`;
   var toDir = days + today;
   return toDir;
 }
