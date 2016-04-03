@@ -1,28 +1,35 @@
 # nonote
 Nonote is a Command Line Node application for taking notes in Git Hub flavored Markdown!
 
-It is really useful if you like staying in the terminal and want a place to write something down!
+It is really useful if you like staying in the terminal and want a place to write
+something down but you also don't want to litter your file system with random files.
 
 A great paring of tools with nonote is:
- - vim,
  - tmux
- - your environments version of `watch cat <note>.md`
+ - vim
+ - your environments version of `watch cat <note>.md` (mac will need a brew install watch)
 
 ## Installation
 When installing `nonote` make sure it is done with the -g flag as nonote is
 intended to be used in the global context. No matter where you are you should be able
 to add a note!
 
-## Initialize
+```sh
+npm i -g nonote
+```
 
-Nonote knows where to make a folder based on a `.nonoterc.json` that simply stores
-the path to a folder. The `nono init` command fills this out for you.
+## Initialize
+Nonote needs to know where you would like to take notes!
+This path is stored in a`.nonoterc.json`
+
+The `nono init` command fills this out for you.
 
 ```sh
 $ nonote init
 ```
-If you elect to let nonote create your directory it will also create a `templates` directory with a `default.json`
-file that is used for the `nonote new` command.
+
+It is recommended that you let nonote create your directory as it will also create
+a `templates` directory with a `default.json` file that is used for the `nonote new` command.
 
 _insert image of folder struture and what you have to conform to if you don't use nono init_
 
@@ -30,7 +37,9 @@ _insert image of folder struture and what you have to conform to if you don't us
 ```sh
 $ nonote new
  ```
-Create a new note for the day from your template
+Creates a new note for the day from your template
+
+_should add a check on this command to create the templates and default.json if they didn't before_
 
 ```sh
 $ nonote <ENTER NOTE DISCRIPTION HERE>
