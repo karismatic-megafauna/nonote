@@ -37,6 +37,20 @@ function makeNote(jsonObj) {
   // console.log(`note for ${dir} modified!`);
 }
 
+function createSection(name, cliRef, description = 'no description') {
+  var dir = getDateDir();
+  var toData = `${dir}/data.json`;
+  var dataJSON = fs.readJsonSync(toData);
+  dataJSON[name] = {
+    'cli-ref': cliRef,
+    'description': description,
+    'items': []
+  };
+  fs.writeJsonSync(toData, dataJSON);
+  makeNote(dataJSON);
+  // TODO: make makenote sycronus
+}
+
 function addNote(noteObj, key) {
   var dir = getDateDir();
   var toData = `${dir}/data.json`;
@@ -63,7 +77,7 @@ function addNote(noteObj, key) {
 function changeStatus(index, key, cb) {
   var dir = getDateDir();
   var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(`${dir}/data.json`);
+  var dataJSON = fs.readJsonSync(toData);
   var cliFound = false;
   Object.keys(dataJSON).map(function(note, noteIndex){
     if (dataJSON[note]['cli-ref'] === key) {
@@ -122,6 +136,7 @@ function initializeNotes(userDir) {
   console.log(chalk.cyan(dotFileJSON.notesDirectory));
   console.log(' ');
 }
+
 function getRootDir() {
   var config = `${process.env.HOME}/.nonoterc.json`;
   // TODO: handle the case of `nonote new` when `nonote init` has not been run
@@ -169,10 +184,25 @@ program
     console.log(chalk.cyan(`creating new note from the ${template} template!`));
 
     fs.mkdirsSync(notePath);
-    fs.copySync(templateData, noteJSON);
-    makeNote(fs.readJsonSync(noteJSON));
 
     console.log(chalk.white('new note created'));
+  });
+
+
+program
+  .command('section')
+  .alias('s')
+  .description('create new section')
+  .action( function() {
+    co(function *() {
+      var sectionName = yield prompt('New section name: ');
+      var cliRefName = yield prompt('Cli reference key: ');
+      var description = yield prompt('Short description: ');
+
+      createSection(sectionName, cliRefName, description);
+
+      console.log(chalk.green(`new section [${sectionName}] was created!`));
+    })
   });
 
 program
@@ -244,6 +274,7 @@ program
       console.log(chalk.red(e));
     }
   });
+
 
 program
   .command('failed [cli-ref] <index>')
