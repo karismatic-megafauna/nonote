@@ -13,7 +13,9 @@ import co from 'co';
 import prompt from 'co-prompt';
 import templateJSON from '../templates/default.json';
 
-function makeNote(jsonObj) {
+var emptyFunc = () => {};
+
+function makeNote(jsonObj, cb = emptyFunc) {
   var dir = getDateDir();
   var toMd = `${dir}/note.md`;
   var noteMd = fs.createWriteStream(toMd);
@@ -34,6 +36,8 @@ function makeNote(jsonObj) {
     });
     noteMd.write("\n");
   });
+  noteMd.on('finish', cb);
+  noteMd.end();
   // console.log(`note for ${dir} modified!`);
 }
 
@@ -47,7 +51,8 @@ function createSection(name, cliRef, description = 'no description') {
     'items': []
   };
   fs.writeJsonSync(toData, dataJSON);
-  makeNote(dataJSON);
+  makeNote(dataJSON, () => {process.exit();});
+
   // TODO: make makenote sycronus
 }
 
@@ -204,7 +209,7 @@ program
 
       createSection(sectionName, cliRefName, description);
 
-      console.log(chalk.green(`new section [${sectionName}] was created!`));
+      console.log(chalk.green(`new section '${sectionName}' was created!`));
     })
   });
 
