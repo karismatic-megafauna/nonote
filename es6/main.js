@@ -41,6 +41,15 @@ function makeNote(jsonObj, cb = emptyFunc) {
   // console.log(`note for ${dir} modified!`);
 }
 
+function removeSection(section) {
+  var dir = getDateDir();
+  var toData = `${dir}/data.json`;
+  var dataJSON = fs.readJsonSync(toData);
+
+  fs.writeJsonSync(toData, dataJSON);
+  makeNote(dataJSON);
+}
+
 function createSection(name, cliRef, description = 'no description') {
   var dir = getDateDir();
   var toData = `${dir}/data.json`;
@@ -247,14 +256,21 @@ program
 program
   .command('remove <cli-ref> [index]')
   .alias('r')
+  .option('-s, --section', 'remove a seciton')
   .description('remove note from note object')
-  .action(function(ref, note, cmd) {
-    try {
-      changeStatus(note, ref, removeNote);
-      console.log(chalk.green(`note at index[${note}] was removed!`));
-    } catch (e) {
-      console.log(chalk.red(e));
+  .action(function(ref, note, options) {
+    console.log('ref', ref)
+    console.log('note', note)
+    console.log('options', options.section)
+    if(options.section && note == undefined) {
+      console.log('hi');
     }
+    // try {
+    //   changeStatus(note, ref, removeNote);
+    //   console.log(chalk.green(`note at index[${note}] was removed!`));
+    // } catch (e) {
+    //   console.log(chalk.red(e));
+    // }
   });
 
 program
