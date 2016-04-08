@@ -180,10 +180,13 @@ program
     var noteJSON = `${notePath}/data.json`;
     var rootDir = getRootDir();
     var templateData = `${rootDir}/templates/${template}.json`;
+    console.log(notePath, noteJSON, rootDir, templateData);
 
     console.log(chalk.cyan(`creating new note from the ${template} template!`));
 
     fs.mkdirsSync(notePath);
+    fs.copySync(templateData, noteJSON);
+    makeNote(fs.readJsonSync(noteJSON));
 
     console.log(chalk.white('new note created'));
   });
