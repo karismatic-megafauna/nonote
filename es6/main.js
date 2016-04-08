@@ -232,7 +232,7 @@ program
   });
 
 program
-  .command('add [cli-ref] <notes...>')
+  .command('add <cli-ref> [notes...]')
   .alias('a')
   .description('add note to object')
   .action(function(ref, note, cmd) {
@@ -245,7 +245,7 @@ program
   });
 
 program
-  .command('remove [cli-ref] <index>')
+  .command('remove <cli-ref> [index]')
   .alias('r')
   .description('remove note from note object')
   .action(function(ref, note, cmd) {
@@ -258,7 +258,7 @@ program
   });
 
 program
-  .command('complete [cli-ref] <index>')
+  .command('complete <cli-ref> [index]')
   .alias('c')
   .description('mark item as complete')
   .action(function(ref, note, cmd) {
@@ -271,7 +271,7 @@ program
   });
 
 program
-  .command('incomplete [cli-ref] <index>')
+  .command('incomplete <cli-ref> [index]')
   .alias('i')
   .description('mark item as incomplete')
   .action(function(ref, note, cmd) {
