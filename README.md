@@ -191,22 +191,22 @@ Oh wait, yes you do...
 
 ---
 
-And that is basically nonote!
+th-th-th-that's all folks!
 
-# Roadmap
+## Roadmap
 A few things I would really like to add to nonote are:
 - Note rollover (for incomplete tasks)
 - Weekly roundup
 - Tests...should have TDD'd this :/ oh well!
 
-# Misc
+## Misc
 Here are some template ideas:
 - Exercise template
 - Coding template
 - Work template
 - Travel template
 
-# Contributing
+## Contributing
 Always looking for contributors, no matter how big or small, any PR is an appreciated one :)
 If you want to be on this repo send me an email or a tweet!
 
