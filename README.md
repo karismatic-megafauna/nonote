@@ -35,7 +35,23 @@ It is recommended that you let nonote create your directory as it will also crea
 a `templates` directory with a `default.json` file that is used for the `nonote new` command.
 
 If you do not let `nonote` create your directory, you must adhere to this folder structure:
-![nono folder structure](http://i.imgur.com/e89hFvz.png)
+
+```
+.
+├── days
+│   ├── 01-04-2016
+│   │   ├── data.json
+│   │   └── note.md
+│   ├── 02-04-2016
+│   │   ├── data.json
+│   │   └── note.md
+│   └── 04-04-2016
+│       ├── data.json
+│       └── note.md
+└── templates
+    ├── default.json
+    └── weekend.json
+```
 
 ## Usage
 ```sh
