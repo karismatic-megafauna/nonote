@@ -75,7 +75,7 @@ nono new
 ```
 Creates a new note for the day from a specified template:
 
-![nono new](https://media.giphy.com/media/3oGRFwEQBbLd0hPu1i/giphy.gif)
+![nono new](https://media.giphy.com/media/3oGRFDuVhcqBFSfGhO/giphy.gif)
 
 nonote will grab the `default.json` file in `templates` if nothing is specified.
 
