@@ -1,6 +1,6 @@
 {
   "name": "nonote",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "a node application for taking notes in markdown from the command line",
   "main": "main.js",
   "scripts": {
