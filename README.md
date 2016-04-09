@@ -5,11 +5,13 @@ Nonote is a Command Line Node application for taking notes from the command line
 
 ## Motivation
 
-I love being in the terminal, it is so nice. I really dislike how many applications I have
-to have open to do something as simple as have some text with a checkbox next to it.
+There are a bunch of reasons why I made `nonote` here are just a few:
+- Would like to write and mutate notes from the command line
+- Reduce the number of apps I have open, a markdown file is fine for me :)
+- Wanted to learn how to write a CLI in node!
+- Really like tracking useless shit about my life #bigdatafail
 
-The terminal is just fine for that!
-
+## Who is nonote for?
 Nonote is really useful if you like staying in the terminal and want a place to write
 something down but you also don't want to litter your file system with random files.
 
@@ -122,7 +124,8 @@ nono c wn 1
 Yay! You solved that darn bug! Check that off your list :)
 
 ![nono complete](https://media.giphy.com/media/l4hLxLPsF9HjGoxnG/giphy.gif)
-Mark note `1` in the `wn` section as complete with github flavoured markdown: `- [x]`
+
+> Mark note `1` in the `wn` section as complete with github flavoured markdown: `- [x]`
 
 
 #### Incomplete a note
@@ -132,7 +135,8 @@ nono i wn 1
 Aw Cuss! You didn't _actually_ complete that task, change it's status :(
 
 ![nono incomplete](https://media.giphy.com/media/26CYzMaBBuYFBQ3Pa/giphy.gif)
-Mark note `1` in the `wn` section as incomplete with github flavoured markdown: `- [ ]`
+
+> Mark note `1` in the `wn` section as incomplete with github flavoured markdown: `- [ ]`
 
 #### Fail a note
 ```sh
@@ -141,7 +145,8 @@ nono f wn 1
 Holy cats that bug is just impossible to fix, mark it as failed.
 
 ![nono incomplete](https://media.giphy.com/media/3o85fZPjuKGC0eNlMQ/giphy.gif)
-Mark note `1` in the `wn` section as incomplete with what I am using to represent a third state in a binary system ... `- [-]`
+
+> Mark note `1` in the `wn` section as incomplete (not valid GFMD)`- [-]`
 
 #### Remove a note
 ```sh
@@ -150,7 +155,8 @@ nono r wn 1
 You didn't need to do that task anyways, f it!
 
 ![nono incomplete](https://media.giphy.com/media/3oGRFwIRkw7ytv5pa8/giphy.gif)
-Remove note `1` in the `wn` section
+
+> Remove note `1` in the `wn` section
 
 #### Remove a section
 ```sh
@@ -159,7 +165,8 @@ nono r wn -s
 Ya know what? You don't even need that whole section!
 
 ![nono incomplete](https://media.giphy.com/media/3oGRFta0BNx80wnDvq/giphy.gif)
-Remove section `wn`
+
+> Remove section `wn`
 
 #### Add a section
 ```sh
@@ -168,7 +175,8 @@ nono s
 Oh wait, yes you do...
 
 ![nono incomplete](https://media.giphy.com/media/3oGRFwVYo1hPwgkHQs/giphy.gif)
-The cli ref is how you will reference this note from the cli, so make it short!
+
+> The cli ref is how you will reference this note from the cli, so make it short!
 
 ---
 
@@ -193,4 +201,5 @@ If you want to be on this repo send me an email or a tweet!
 
 ## Contact me
 > the electronic mailz --> michaelghinrichs@gmail.com
+
 > the tweeter --> @mghinrichs
