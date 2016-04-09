@@ -52,12 +52,9 @@ If you do not let `nonote` create your directory, you *must* adhere to this fold
 │   ├── 01-04-2016
 │   │   ├── data.json
 │   │   └── note.md
-│   ├── 02-04-2016
-│   │   ├── data.json
-│   │   └── note.md
-│   └── 04-04-2016
-│       ├── data.json
-│       └── note.md
+│   └── 02-04-2016
+│       ├── data.json
+│       └── note.md
 └── templates
     ├── default.json
     └── weekend.json
@@ -91,7 +88,7 @@ Now that you have a place to take some notes, let's add some tasks for you to do
 
 ```sh
 $ nono add <section> <ENTER NOTE DISCRIPTION HERE>
-nono add wn fix production, it's on fire :(
+nono add wn fix that darn bug
 nono a wn apologize to support
 ```
 
