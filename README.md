@@ -95,6 +95,8 @@ your `.nonoterc.json`
 
 Having a textfile that you are watching for changes is the heart of nonote!
 
+---
+
 ### Add some notes
 
 Now that you have a place to take some notes, let's add some tasks for you to do!
@@ -127,6 +129,7 @@ Yay! You solved that darn bug! Check that off your list :)
 
 > Mark note `1` in the `wn` section as complete with github flavoured markdown: `- [x]`
 
+---
 
 #### Incomplete a note
 ```sh
@@ -138,6 +141,8 @@ Aw Cuss! You didn't _actually_ complete that task, change it's status :(
 
 > Mark note `1` in the `wn` section as incomplete with github flavoured markdown: `- [ ]`
 
+---
+
 #### Fail a note
 ```sh
 nono f wn 1
@@ -147,6 +152,8 @@ Holy cats that bug is just impossible to fix, mark it as failed.
 ![nono incomplete](https://media.giphy.com/media/3o85fZPjuKGC0eNlMQ/giphy.gif)
 
 > Mark note `1` in the `wn` section as incomplete (not valid GFMD)`- [-]`
+
+---
 
 #### Remove a note
 ```sh
@@ -158,6 +165,8 @@ You didn't need to do that task anyways, f it!
 
 > Remove note `1` in the `wn` section
 
+---
+
 #### Remove a section
 ```sh
 nono r wn -s
@@ -167,6 +176,8 @@ Ya know what? You don't even need that whole section!
 ![nono incomplete](https://media.giphy.com/media/3oGRFta0BNx80wnDvq/giphy.gif)
 
 > Remove section `wn`
+
+---
 
 #### Add a section
 ```sh
