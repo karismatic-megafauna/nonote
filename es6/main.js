@@ -46,6 +46,12 @@ function removeSection(section) {
   var toData = `${dir}/data.json`;
   var dataJSON = fs.readJsonSync(toData);
 
+  Object.keys(dataJSON).map(note => {
+    if ( dataJSON[note]['cli-ref'] === section ) {
+      delete dataJSON[note];
+    }
+  });
+
   fs.writeJsonSync(toData, dataJSON);
   makeNote(dataJSON);
 }
@@ -259,18 +265,16 @@ program
   .option('-s, --section', 'remove a seciton')
   .description('remove note from note object')
   .action(function(ref, note, options) {
-    console.log('ref', ref)
-    console.log('note', note)
-    console.log('options', options.section)
-    if(options.section && note == undefined) {
-      console.log('hi');
+    if (options.section && note === undefined) {
+      removeSection(ref);
+    } else {
+      try {
+        changeStatus(note, ref, removeNote);
+        console.log(chalk.green(`note at index[${note}] was removed!`));
+      } catch (e) {
+        console.log(chalk.red(e));
+      }
     }
-    // try {
-    //   changeStatus(note, ref, removeNote);
-    //   console.log(chalk.green(`note at index[${note}] was removed!`));
-    // } catch (e) {
-    //   console.log(chalk.red(e));
-    // }
   });
 
 program
