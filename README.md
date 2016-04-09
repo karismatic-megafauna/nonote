@@ -28,10 +28,14 @@ The `nono init` command fills this out for you.
 $ nonote init
 ```
 
+![nono init](https://media.giphy.com/media/3oGRFIR51GrfMerzlm/giphy.gif)
+
+
 It is recommended that you let nonote create your directory as it will also create
 a `templates` directory with a `default.json` file that is used for the `nonote new` command.
 
-_insert image of folder struture and what you have to conform to if you don't use nono init_
+If you do not let `nonote` create your directory, you must adhere to this folder structure:
+![nono folder structure](http://i.imgur.com/e89hFvz.png)
 
 ## Usage
 ```sh
