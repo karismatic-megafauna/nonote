@@ -48,6 +48,7 @@ function removeSection(section) {
 
   Object.keys(dataJSON).map(note => {
     if ( dataJSON[note]['cli-ref'] === section ) {
+      console.log(`"${chalk.cyan(note)}" section was removed!`);
       delete dataJSON[note];
     }
   });
