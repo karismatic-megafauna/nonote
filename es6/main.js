@@ -217,15 +217,19 @@ program
   .alias('w')
   .description('watches todays note')
   .action(function(){
-
     let notePath = getDateDir();
     let noteMd = `${notePath}/note.md`;
+    const cb = (err, stdout, stderr) => {
+      console.log(`${stdout}`);
+    }
 
-    console.log(noteMd);
-    // const cb = (err, stdout, stderr) => {
-    //   console.log(`stdout: ${stdout}`);
-    // }
-    // exec(`watch cat ${noteMd}`, cb);
+    exec(`clear`, cb);
+    exec(`cat ${noteMd}`, cb);
+
+    fs.watch(noteMd, () => {
+      exec(`clear`, cb);
+      exec(`cat ${noteMd}`, cb);
+    });
   });
 
 
