@@ -1,10 +1,12 @@
 {
   "name": "nonote",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "a node application for taking notes in markdown from the command line",
-  "main": "main.js",
+  "main": "./es5/main.js",
   "scripts": {
     "build": "babel es6 --out-dir es5 --source-maps",
+    "prepublish": "npm run build",
+    "postinstall": "npm run build",
     "watch": "babel es6 --out-dir es5 --source-maps --watch",
     "start": "node es5/main.js"
   },
