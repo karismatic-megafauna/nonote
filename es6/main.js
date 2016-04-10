@@ -12,6 +12,7 @@ import moment from 'moment';
 import co from 'co';
 import prompt from 'co-prompt';
 import templateJSON from '../templates/default.json';
+import { exec } from 'child_process';
 
 var emptyFunc = () => {};
 
@@ -209,6 +210,26 @@ program
     makeNote(fs.readJsonSync(noteJSON));
 
     console.log(`\nnew note created for today: \n${chalk.cyan(notePath)}`);
+  });
+
+program
+  .command('watch')
+  .alias('w')
+  .description('watches todays note')
+  .action(function(){
+    let notePath = getDateDir();
+    let noteMd = `${notePath}/note.md`;
+    const cb = (err, stdout, stderr) => {
+      console.log(`${stdout}`);
+    }
+
+    exec(`clear`, cb);
+    exec(`cat ${noteMd}`, cb);
+
+    fs.watch(noteMd, () => {
+      exec(`clear`, cb);
+      exec(`cat ${noteMd}`, cb);
+    });
   });
 
 
