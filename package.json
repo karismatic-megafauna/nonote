@@ -1,6 +1,6 @@
 {
   "name": "nonote",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "a node application for taking notes in markdown from the command line",
   "main": "./lib/main.js",
   "scripts": {
@@ -41,13 +41,13 @@
     "fs-extra": "^0.26.7",
     "jsonfile": "^2.2.3",
     "mkdirp": "^0.5.1",
-    "moment": "^2.12.0"
+    "moment": "^2.12.0",
+    "source-map-support": "^0.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-polyfill": "^6.7.4",
     "babel-preset-es2015-node5": "^1.2.0",
-    "json-loader": "^0.5.4",
-    "source-map-support": "^0.4.0"
+    "json-loader": "^0.5.4"
   }
 }
