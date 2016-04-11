@@ -1,8 +1,8 @@
 {
   "name": "nonote",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "a node application for taking notes in markdown from the command line",
-  "main": "./src/main.js",
+  "main": "./lib/main.js",
   "scripts": {
     "build": "babel src --out-dir lib --source-maps",
     "prepublish": "npm run build",
