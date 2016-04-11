@@ -18,7 +18,6 @@ something down but you also don't want to litter your file system with random fi
 nonote works best with:
  - tmux / some sort of multiplexed terminal
  - vim / emacs / other terminal based text editor
- - your environments version of `watch cat <file>` (mac will need a `brew install watch`)
 
 ## Installation
 
@@ -93,7 +92,10 @@ nono watch
 Will run a watch command on todays `note.md` file in the directory specified by
 your `.nonoterc.json`
 
+![nono watch](https://media.giphy.com/media/3o6ozsOz4kd9hgERby/giphy.gif)
+
 Having a textfile that you are watching for changes is the heart of nonote!
+Use this feature!
 
 ---
 

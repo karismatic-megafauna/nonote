@@ -219,6 +219,11 @@ program
   .action(function(){
     let notePath = getDateDir();
     let noteMd = `${notePath}/note.md`;
+    // fs.statSync(noteMd, (err, stats) => {
+    //   if (err) {
+    //     throw new Error('No note.md! Run "nono new" to generate one :) ');
+    //   }
+    // });
     const cb = (err, stdout, stderr) => {
       console.log(`${stdout}`);
     }
