@@ -1,7 +1,6 @@
 # nonote
 
 Nonote is a Command Line Node application for taking notes from the command line in Git Hub flavored Markdown!
-> Disclaimer, I have not tested this on anything but a mac...so please report funk on other Linux distros
 
 ## Motivation
 
@@ -9,7 +8,6 @@ There are a bunch of reasons why I made `nonote` here are just a few:
 - Would like to write and mutate notes from the command line
 - Reduce the number of apps I have open, a markdown file is fine for me :)
 - Wanted to learn how to write a CLI in node!
-- Really like tracking useless shit about my life #bigdatafail
 
 ## Who is nonote for?
 Nonote is really useful if you like staying in the terminal and want a place to write
