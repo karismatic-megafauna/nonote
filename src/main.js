@@ -69,8 +69,6 @@ function createSection(name, cliRef, description = 'no description') {
   };
   fs.writeJsonSync(toData, dataJSON);
   makeNote(dataJSON, () => {process.exit();});
-
-  // TODO: make makenote sycronus
 }
 
 function addNote(noteObj, key) {
@@ -96,7 +94,7 @@ function addNote(noteObj, key) {
   makeNote(dataJSON);
 }
 
-function changeStatus(index, key, cb) {
+function changeStatus(index, key) {
   var dir = getDateDir();
   var toData = `${dir}/data.json`;
   var dataJSON = fs.readJsonSync(toData);
@@ -107,7 +105,6 @@ function changeStatus(index, key, cb) {
       if (!dataJSON[note]['items'][index]) {
         throw new Error(`index ${index} in "${key}" object does not exist`);
       }
-      cb(dataJSON[note]['items'], index);
       fs.writeJsonSync(toData, dataJSON);
     } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
       throw new Error(`"${key}" <cli-ref> does not exist`);
@@ -268,12 +265,12 @@ program
   });
 
 program
-  .command('add <cli-ref> [notes...]')
+  .command('add <cli-ref> <notes...>')
   .alias('a')
   .description('add note to object')
-  .action(function(ref, note, cmd) {
+  .action(function(cliRef, noteText, cmd) {
     try {
-      addNote(note, ref);
+      addNote(noteText, cliRef);
       console.log(chalk.green('note added!'));
     } catch (e) {
       console.log(chalk.red(e));
@@ -283,15 +280,15 @@ program
 program
   .command('remove <cli-ref> [index]')
   .alias('r')
-  .option('-s, --section', 'remove a seciton')
+  .option('-s, --section', 'remove a section')
   .description('remove note from note object')
-  .action(function(ref, note, options) {
-    if (options.section && note === undefined) {
-      removeSection(ref);
+  .action(function(cliRef, index, options) {
+    if (options.section && index === undefined) {
+      removeSection(cliRef);
     } else {
       try {
-        changeStatus(note, ref, removeNote);
-        console.log(chalk.green(`note at index[${note}] was removed!`));
+        changeStatus(index, cliRef);
+        console.log(chalk.green(`note at index[${index}] was removed!`));
       } catch (e) {
         console.log(chalk.red(e));
       }
@@ -299,12 +296,12 @@ program
   });
 
 program
-  .command('complete <cli-ref> [index]')
+  .command('complete <cli-ref> <index>')
   .alias('c')
   .description('mark item as complete')
   .action(function(ref, note, cmd) {
     try {
-      changeStatus(note, ref, completeNote);
+      changeStatus(note, ref);
       console.log(chalk.green(`note at index[${note}] was marked as complete!`));
     } catch (e) {
       console.log(chalk.red(e));
@@ -312,13 +309,13 @@ program
   });
 
 program
-  .command('incomplete <cli-ref> [index]')
+  .command('incomplete <cli-ref> <index>')
   .alias('i')
   .description('mark item as incomplete')
-  .action(function(ref, note, cmd) {
+  .action(function(cliRef, index, cmd) {
     try {
-      changeStatus(note, ref, incompleteNote);
-      console.log(chalk.green(`note at index[${note}] was marked as incomplete!`));
+      changeStatus(index, cliRef);
+      console.log(chalk.green(`note at index[${index}] was marked as incomplete!`));
     } catch (e) {
       console.log(chalk.red(e));
     }
@@ -329,10 +326,10 @@ program
   .command('failed [cli-ref] <index>')
   .alias('f')
   .description('mark item as failed')
-  .action(function(ref, note, cmd) {
+  .action(function(cliRef, index, cmd) {
     try {
-      changeStatus(note, ref, failNote);
-      console.log(chalk.green(`note at index[${note}] was marked as failed :(`));
+      changeStatus(index, cliRef);
+      console.log(chalk.green(`note at index[${index}] was marked as failed :(`));
     } catch (e) {
       console.log(chalk.red(e));
     }
