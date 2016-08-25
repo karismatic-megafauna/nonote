@@ -268,12 +268,12 @@ program
   });
 
 program
-  .command('add <cli-ref> [notes...]')
+  .command('add <cli-ref> <notes...>')
   .alias('a')
   .description('add note to object')
-  .action(function(ref, note, cmd) {
+  .action(function(cliRef, noteText, cmd) {
     try {
-      addNote(note, ref);
+      addNote(noteText, cliRef);
       console.log(chalk.green('note added!'));
     } catch (e) {
       console.log(chalk.red(e));
@@ -281,17 +281,17 @@ program
   });
 
 program
-  .command('remove <cli-ref> [index]')
+  .command('remove <cli-ref> <index>')
   .alias('r')
   .option('-s, --section', 'remove a seciton')
   .description('remove note from note object')
-  .action(function(ref, note, options) {
-    if (options.section && note === undefined) {
-      removeSection(ref);
+  .action(function(cliRef, index, options) {
+    if (options.section && index === undefined) {
+      removeSection(cliRef);
     } else {
       try {
-        changeStatus(note, ref, removeNote);
-        console.log(chalk.green(`note at index[${note}] was removed!`));
+        changeStatus(index, cliRef, removeNote);
+        console.log(chalk.green(`note at index[${index}] was removed!`));
       } catch (e) {
         console.log(chalk.red(e));
       }
@@ -299,7 +299,7 @@ program
   });
 
 program
-  .command('complete <cli-ref> [index]')
+  .command('complete <cli-ref> <index>')
   .alias('c')
   .description('mark item as complete')
   .action(function(ref, note, cmd) {
@@ -312,13 +312,13 @@ program
   });
 
 program
-  .command('incomplete <cli-ref> [index]')
+  .command('incomplete <cli-ref> <index>')
   .alias('i')
   .description('mark item as incomplete')
-  .action(function(ref, note, cmd) {
+  .action(function(cliRef, index, cmd) {
     try {
-      changeStatus(note, ref, incompleteNote);
-      console.log(chalk.green(`note at index[${note}] was marked as incomplete!`));
+      changeStatus(index, cliRef, incompleteNote);
+      console.log(chalk.green(`note at index[${index}] was marked as incomplete!`));
     } catch (e) {
       console.log(chalk.red(e));
     }
@@ -329,10 +329,10 @@ program
   .command('failed [cli-ref] <index>')
   .alias('f')
   .description('mark item as failed')
-  .action(function(ref, note, cmd) {
+  .action(function(cliRef, index, cmd) {
     try {
-      changeStatus(note, ref, failNote);
-      console.log(chalk.green(`note at index[${note}] was marked as failed :(`));
+      changeStatus(index, cliRef, failNote);
+      console.log(chalk.green(`note at index[${index}] was marked as failed :(`));
     } catch (e) {
       console.log(chalk.red(e));
     }
