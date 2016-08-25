@@ -113,7 +113,7 @@ function changeStatus(index, key, cb) {
       throw new Error(`"${key}" <cli-ref> does not exist`);
     }
   });
-  makeNote(dataJSON);
+  makeNote(dataJSON, () => {process.exit();});
 }
 
 function removeNote(arry, index) {
@@ -271,7 +271,7 @@ program
   .command('add <cli-ref> [notes...]')
   .alias('a')
   .description('add note to object')
-  .action(function(ref, note, cmd) {
+  .action(function(ref, note) {
     try {
       addNote(note, ref);
       console.log(chalk.green('note added!'));
@@ -302,7 +302,7 @@ program
   .command('complete <cli-ref> [index]')
   .alias('c')
   .description('mark item as complete')
-  .action(function(ref, note, cmd) {
+  .action(function(ref, note) {
     try {
       changeStatus(note, ref, completeNote);
       console.log(chalk.green(`note at index[${note}] was marked as complete!`));
@@ -315,7 +315,7 @@ program
   .command('incomplete <cli-ref> [index]')
   .alias('i')
   .description('mark item as incomplete')
-  .action(function(ref, note, cmd) {
+  .action(function(ref, note) {
     try {
       changeStatus(note, ref, incompleteNote);
       console.log(chalk.green(`note at index[${note}] was marked as incomplete!`));
@@ -329,7 +329,7 @@ program
   .command('failed [cli-ref] <index>')
   .alias('f')
   .description('mark item as failed')
-  .action(function(ref, note, cmd) {
+  .action(function(ref, note) {
     try {
       changeStatus(note, ref, failNote);
       console.log(chalk.green(`note at index[${note}] was marked as failed :(`));
