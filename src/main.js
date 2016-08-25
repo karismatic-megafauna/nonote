@@ -281,7 +281,7 @@ program
   });
 
 program
-  .command('remove <cli-ref> <index>')
+  .command('remove <cli-ref> [index]')
   .alias('r')
   .option('-s, --section', 'remove a section')
   .description('remove note from note object')
