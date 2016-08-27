@@ -223,13 +223,20 @@ program
       console.log(`${stdout}`);
     }
 
-    exec(`clear`, cb);
-    exec(`cat ${noteMd}`, cb);
 
-    fs.watch(noteMd, () => {
-      exec(`clear`, cb);
-      exec(`cat ${noteMd}`, cb);
-    });
+    fs.stat(noteMd, (err, stat) => {
+      if (err === null) {
+        exec(`clear`, cb);
+        exec(`cat ${noteMd}`, cb);
+
+        fs.watch(noteMd, () => {
+          exec(`clear`, cb);
+          exec(`cat ${noteMd}`, cb);
+        });
+      } else if (err.code === 'ENOENT') {
+        console.log(`use nonote new`);
+      }
+    })
   });
 
 
