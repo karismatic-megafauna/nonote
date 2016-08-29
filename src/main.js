@@ -166,10 +166,10 @@ function getRootDir() {
 }
 
 function getDateDir(type) {
-  var today = moment().format("DD-MM-YYYY");
-  var notesDir = getRootDir();
-  var days = `${notesDir}/days/`;
-  var toDir = days + today;
+  const today = moment().format("DD-MM-YYYY");
+  const notesDir = getRootDir();
+  const days = `${notesDir}/days/`;
+  const toDir = days + today;
   return toDir;
 }
 
@@ -198,10 +198,10 @@ program
     if(!template) {
       template = 'default';
     }
-    var notePath = getDateDir();
-    var noteJSON = `${notePath}/data.json`;
-    var rootDir = getRootDir();
-    var templateData = `${rootDir}/templates/${template}.json`;
+    const notePath = getDateDir();
+    const noteJSON = `${notePath}/data.json`;
+    const rootDir = getRootDir();
+    const templateData = `${rootDir}/templates/${template}.json`;
 
     console.log(`creating new note from the ${chalk.cyan(template)} template!`);
 
@@ -217,8 +217,8 @@ program
   .alias('w')
   .description('watches todays note')
   .action(function(){
-    let notePath = getDateDir();
-    let noteMd = `${notePath}/note.md`;
+    const notePath = getDateDir();
+    const noteMd = `${notePath}/note.md`;
     const cb = (err, stdout, stderr) => {
       console.log(`${stdout}`);
     }
@@ -234,7 +234,7 @@ program
           exec(`cat ${noteMd}`, cb);
         });
       } else if (err.code === 'ENOENT') {
-        console.log(`use nonote new`);
+        console.log(`You need to make a note for today by running: \nnono new`);
       }
     })
   });
@@ -246,9 +246,9 @@ program
   .description('create new section')
   .action( function() {
     co(function *() {
-      var sectionName = yield prompt('New section name: ');
-      var cliRefName = yield prompt('Cli reference key: ');
-      var description = yield prompt('Short description: ');
+      const sectionName = yield prompt('New section name: ');
+      const cliRefName = yield prompt('Cli reference key: ');
+      const description = yield prompt('Short description: ');
 
       createSection(sectionName, cliRefName, description);
 
@@ -262,11 +262,11 @@ program
   .action(function() {
     co(function *() {
 
-      var notesDirPath = yield prompt('notes directory path (from $HOME): ');
-      var homePath = `${process.env.HOME}/${notesDirPath}`;
+      const notesDirPath = yield prompt('notes directory path (from $HOME): ');
+      const homePath = `${process.env.HOME}/${notesDirPath}`;
       initializeNotes(homePath);
 
-      var shouldCreate = yield prompt.confirm(`Would you like me to create "${homePath}" for you?(Recommended) [y/N] `);
+      const shouldCreate = yield prompt.confirm(`Would you like me to create "${homePath}" for you?(Recommended) [y/N] `);
       createDir(shouldCreate, homePath);
       console.log('Start taking notes with', chalk.cyan('nonote new!'));
       // TODO: create a readme
