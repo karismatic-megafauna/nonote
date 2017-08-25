@@ -39,7 +39,6 @@ function makeNote(jsonObj, cb = emptyFunc) {
   });
   noteMd.on('finish', cb);
   noteMd.end();
-  // console.log(`note for ${dir} modified!`);
 }
 
 function removeSection(section) {
@@ -69,51 +68,77 @@ function createSection(name, cliRef, description = 'no description') {
   };
   fs.writeJsonSync(toData, dataJSON);
   makeNote(dataJSON, () => {process.exit();});
-
-  // TODO: make makenote sycronus
 }
 
 function addNote(noteObj, key) {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-  var noteString = noteObj.reduce(function(memo, word){
-    return memo + ' ' + word;
-  });
+  const today = moment().format("DD-MM-YYYY");
+  var configPath = `${process.env.HOME}/.nonoterc.json`;
+  fs.readJson(configPath, (err, configJSON) => {
+    if (err) console.error(err)
 
-  var descriptionObj = {
-    description: noteString,
-    status: 'incomplete',
-  };
+    const notesDir = configJSON.notesDirectory;
+    const days = `${notesDir}/days/`;
+    const toDir = days + today;
+    const dataPath = `${toDir}/data.json`;
 
-  // modify toData
-  Object.keys(dataJSON).map(function(note){
-    if (dataJSON[note]['cli-ref'] === key) {
-      dataJSON[note]['items'].push(descriptionObj);
-      fs.writeJsonSync(toData, dataJSON);
-    }
+    var noteString = noteObj.reduce(function(memo, word){
+      return memo + ' ' + word;
+    });
+
+    var descriptionObj = {
+      description: noteString,
+      status: 'incomplete',
+    };
+
+    // modify toData
+    fs.readJson(dataPath, (err, dataJSON) => {
+      Object.keys(dataJSON).map(function(note){
+        if (dataJSON[note]['cli-ref'] === key) {
+          dataJSON[note]['items'].push(descriptionObj);
+          fs.writeJson(dataPath, dataJSON, (err) => {
+            if (err) return console.error(err)
+
+            makeNote(dataJSON, () => {process.exit();});
+          });
+        }
+      });
+    });
   });
-  makeNote(dataJSON);
 }
 
 function changeStatus(index, key, cb) {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-  var cliFound = false;
-  Object.keys(dataJSON).map(function(note, noteIndex){
-    if (dataJSON[note]['cli-ref'] === key) {
-      cliFound = true;
-      if (!dataJSON[note]['items'][index]) {
-        throw new Error(`index ${index} in "${key}" object does not exist`);
-      }
-      cb(dataJSON[note]['items'], index);
-      fs.writeJsonSync(toData, dataJSON);
-    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error(`"${key}" <cli-ref> does not exist`);
-    }
+  const today = moment().format("DD-MM-YYYY");
+  var configPath = `${process.env.HOME}/.nonoterc.json`;
+  fs.readJson(configPath, (err, configJSON) => {
+    if (err) console.error(err)
+
+    const notesDir = configJSON.notesDirectory;
+    const days = `${notesDir}/days/`;
+    const toDir = days + today;
+    var toData = `${toDir}/data.json`;
+
+    fs.readJson(toData, (err, dataJSON) => {
+      if (err) console.error(err)
+
+      var cliFound = false;
+      Object.keys(dataJSON).map(function(note, noteIndex){
+        if (dataJSON[note]['cli-ref'] === key) {
+          cliFound = true;
+          if (!dataJSON[note]['items'][index]) {
+            throw new Error(`index ${index} in "${key}" object does not exist`);
+          }
+          cb(dataJSON[note]['items'], index);
+          fs.writeJson(toData, dataJSON, (err) => {
+            if (err) return console.error(err)
+
+            makeNote(dataJSON, () => {process.exit();});
+          });
+        } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
+          throw new Error(`"${key}" <cli-ref> does not exist`);
+        }
+      });
+    });
   });
-  makeNote(dataJSON, () => {process.exit();});
 }
 
 function removeNote(arry, index) {
@@ -165,7 +190,7 @@ function getRootDir() {
   return fs.readJsonSync(config).notesDirectory;
 }
 
-function getDateDir(type) {
+function getDateDir() {
   const today = moment().format("DD-MM-YYYY");
   const notesDir = getRootDir();
   const days = `${notesDir}/days/`;
@@ -212,31 +237,30 @@ program
     console.log(`\nnew note created for today: \n${chalk.cyan(notePath)}`);
   });
 
+
 program
   .command('watch')
   .alias('w')
   .description('watches todays note')
   .action(function(){
-    const notePath = getDateDir();
-    const noteMd = `${notePath}/note.md`;
-    const cb = (err, stdout, stderr) => {
-      console.log(`${stdout}`);
-    }
+    const today = moment().format("DD-MM-YYYY");
+    var configPath = `${process.env.HOME}/.nonoterc.json`;
+    fs.readJson(configPath, (err, configJSON) => {
+      if (err) console.error(err)
 
+      const notesDir = configJSON.notesDirectory;
+      const days = `${notesDir}/days/`;
+      const toDir = days + today;
+      const noteMd = `${toDir}/note.md`;
 
-    fs.stat(noteMd, (err, stat) => {
-      if (err === null) {
-        exec(`clear`, cb);
-        exec(`cat ${noteMd}`, cb);
-
-        fs.watch(noteMd, () => {
-          exec(`clear`, cb);
-          exec(`cat ${noteMd}`, cb);
+      fs.watch(noteMd, (eventType, filename) => {
+        fs.readFile(noteMd, (err, data) => {
+          if (err) throw err;
+          console.log('\x1Bc');
+          console.log(data.toString());
         });
-      } else if (err.code === 'ENOENT') {
-        console.log(`You need to make a note for today by running: \nnono new`);
-      }
-    })
+      });
+    });
   });
 
 
