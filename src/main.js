@@ -42,32 +42,53 @@ function makeNote(jsonObj, cb = emptyFunc) {
 }
 
 function removeSection(section) {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
+  const today = moment().format("DD-MM-YYYY");
+  var configPath = `${process.env.HOME}/.nonoterc.json`;
+  fs.readJson(configPath, (err, configJSON) => {
+    const notesDir = configJSON.notesDirectory;
+    const days = `${notesDir}/days/`;
+    const dir = days + today;
+    var dataPath = `${dir}/data.json`;
+    fs.readJson(dataPath, (err, dataJSON) => {
 
-  Object.keys(dataJSON).map(note => {
-    if ( dataJSON[note]['cli-ref'] === section ) {
-      console.log(`"${chalk.cyan(note)}" section was removed!`);
-      delete dataJSON[note];
-    }
+      Object.keys(dataJSON).map(note => {
+        if ( dataJSON[note]['cli-ref'] === section ) {
+          console.log(`"${chalk.cyan(note)}" section was removed!`);
+          delete dataJSON[note];
+        }
+      });
+
+      fs.writeJson(dataPath, dataJSON, (err) => {
+        if (err) return console.error(err)
+
+        makeNote(dataJSON);
+      })
+    });
   });
-
-  fs.writeJsonSync(toData, dataJSON);
-  makeNote(dataJSON);
 }
 
 function createSection(name, cliRef, description = 'no description') {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-  dataJSON[name] = {
-    'cli-ref': cliRef,
-    'description': description,
-    'items': []
-  };
-  fs.writeJsonSync(toData, dataJSON);
-  makeNote(dataJSON, () => {process.exit();});
+  const today = moment().format("DD-MM-YYYY");
+  var configPath = `${process.env.HOME}/.nonoterc.json`;
+  fs.readJson(configPath, (err, configJSON) => {
+    const notesDir = configJSON.notesDirectory;
+    const days = `${notesDir}/days/`;
+    const dir = days + today;
+    var dataPath = `${dir}/data.json`;
+    fs.readJson(dataPath, (err, dataJSON) => {
+      dataJSON[name] = {
+        'cli-ref': cliRef,
+        'description': description,
+        'items': []
+      };
+
+      fs.writeJson(dataPath, dataJSON, (err) => {
+        if (err) return console.error(err)
+
+        makeNote(dataJSON, () => {process.exit();});
+      })
+    });
+  });
 }
 
 function addNote(noteObj, key) {
