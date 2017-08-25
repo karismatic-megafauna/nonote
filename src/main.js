@@ -253,7 +253,13 @@ program
       const toDir = days + today;
       const noteMd = `${toDir}/note.md`;
 
-      fs.watch(noteMd, (eventType, filename) => {
+      fs.readFile(noteMd, (err, data) => {
+        if (err) throw err;
+        console.log('\x1Bc');
+        console.log(data.toString());
+      });
+
+      fs.watch(noteMd, () => {
         fs.readFile(noteMd, (err, data) => {
           if (err) throw err;
           console.log('\x1Bc');
