@@ -42,27 +42,44 @@ program
   .alias('w')
   .description('watches todays note')
   .action(function(){
-    const today = moment().format("DD-MM-YYYY");
-    var configPath = `${process.env.HOME}/.nonoterc.json`;
-    fs.readJson(configPath, (err, configJSON) => {
-      if (err) console.error(err)
+    co(function *() {
+      const today = moment().format("DD-MM-YYYY");
+      var configPath = `${process.env.HOME}/.nonoterc.json`;
+      fs.readJson(configPath, (err, configJSON) => {
+        if (err) console.error(err)
 
-      const notesDir = configJSON.notesDirectory;
-      const days = `${notesDir}/days/`;
-      const toDir = days + today;
-      const noteMd = `${toDir}/note.md`;
+        const notesDir = configJSON.notesDirectory;
+        const days = `${notesDir}/days/`;
+        const toDir = days + today;
+        const noteMd = `${toDir}/note.md`;
 
-      fs.readFile(noteMd, (err, data) => {
-        if (err) throw err;
-        console.log('\x1Bc');
-        console.log(data.toString());
-      });
+        fs.access(noteMd, fs.constants.F_OK, (err) => {
+          if (err && err.code === 'ENOENT') {
+            const badNotePath = chalk.blue(noteMd);
+            const newNoteCmd = chalk.green('nono new');
+            console.log(`
+Oh man, oh jeez, ok, I-I-I can't access this note:
+${badNotePath}
 
-      fs.watch(noteMd, () => {
-        fs.readFile(noteMd, (err, data) => {
-          if (err) throw err;
-          console.log('\x1Bc');
-          console.log(data.toString());
+C-c-can you try m-m-making a new note or s-s-something?
+${newNoteCmd}
+            `);
+            return;
+          }
+
+          fs.readFile(noteMd, (err, data) => {
+            if (err) throw err;
+            console.log('\x1Bc');
+            console.log(data.toString());
+          });
+
+          fs.watch(noteMd, () => {
+            fs.readFile(noteMd, (err, data) => {
+              if (err) throw err;
+              console.log('\x1Bc');
+              console.log(data.toString());
+            });
+          });
         });
       });
     });
@@ -82,7 +99,7 @@ program
       Utils.createSection(sectionName, cliRefName, description);
 
       console.log(chalk.green(`new section '${sectionName}' was created!`));
-    })
+    });
   });
 
 program
