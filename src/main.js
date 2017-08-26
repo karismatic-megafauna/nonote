@@ -73,7 +73,7 @@ program
   .command('section')
   .alias('s')
   .description('create new section')
-  .action( function() {
+  .action(function() {
     co(function *() {
       const sectionName = yield prompt('New section name: ');
       const cliRefName = yield prompt('Cli reference key: ');
