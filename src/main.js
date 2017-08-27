@@ -71,11 +71,15 @@ program
                 noteObj[firstNote].items = mergedItems;
               }
 
-              Utils.makeNote(noteObj);
-              const watchCmd = 'nono watch';
-              console.log(`\nGreat success! Here is your note for today: \n${chalk.cyan(noteMdPath)}`);
-              console.log(`\nYou can see the note by running ${chalk.green(watchCmd)} anywhere in your console!`);
-            });
+              fs.writeJson(dataJSONPath, noteObj, (err) => {
+                if (err) return console.error(err)
+
+                Utils.makeNote(noteObj);
+                const watchCmd = 'nono watch';
+                console.log(`\nGreat success! Here is your note for today: \n${chalk.cyan(noteMdPath)}`);
+                console.log(`\nYou can see the note by running ${chalk.green(watchCmd)} anywhere in your console!`);
+              });
+            })
           });
         });
       });
