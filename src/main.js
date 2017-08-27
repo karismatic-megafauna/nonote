@@ -22,18 +22,64 @@ program
     if(!template) {
       template = 'default';
     }
-    const notePath = Utils.getDateDir();
-    const noteJSON = `${notePath}/data.json`;
-    const rootDir = Utils.getRootDir();
-    const templateData = `${rootDir}/templates/${template}.json`;
+    const today = moment().format("DD-MM-YYYY");
+    const yesterday = moment().subtract(1, 'day').format("DD-MM-YYYY");
+    var configPath = `${process.env.HOME}/.nonoterc.json`;
 
-    console.log(`creating new note from the ${chalk.cyan(template)} template!`);
+    fs.readJson(configPath, (err, configObj) => {
+      if (err) console.error(err)
 
-    fs.mkdirsSync(notePath);
-    fs.copySync(templateData, noteJSON);
-    Utils.makeNote(fs.readJsonSync(noteJSON));
+      const notesDir = configObj.notesDirectory;
+      const days = `${notesDir}/days/`;
+      const todayPath = days + today;
+      const yesterdayPath = days + yesterday;
+      const yesterdayDataJSONPath= `${yesterdayPath}/data.json`;
+      const dataJSONPath = `${todayPath}/data.json`;
+      const noteMdPath = `${todayPath}/note.md`;
 
-    console.log(`\nnew note created for today: \n${chalk.cyan(notePath)}`);
+      const templateDataPath = `${notesDir}/templates/${template}.json`;
+
+      fs.mkdirs(todayPath, (err) => {
+        if (err) console.error(err)
+
+        fs.copy(templateDataPath, dataJSONPath, (err) => {
+          if (err) console.error(err)
+
+          fs.readJson(yesterdayDataJSONPath, (err, yesterdayObj) => {
+            let hasPreviousNote = true;
+            let incompleteTasks = [];
+
+            if (err && err.code === 'ENOENT') {
+              hasPreviousNote = false;
+            }
+
+            if (hasPreviousNote) {
+              incompleteTasks = Object.keys(yesterdayObj).map(section => {
+                return yesterdayObj[section].items.filter(item => {
+                  return item.status !== "complete"
+                });
+              })[0];
+            }
+
+            fs.readJson(dataJSONPath, (err, noteObj) => {
+              console.log(`Creating new note from the ${chalk.green(template)} template...`);
+              if (hasPreviousNote && incompleteTasks.length > 0) {
+                console.log(`\nCopying ${chalk.cyan(incompleteTasks.length)} incomplete tasks from yesterday:`);
+                incompleteTasks.forEach((task, i) => console.log(`   ${chalk.cyan(i)}.) ${task.description}`));
+                const firstNote = Object.keys(noteObj)[0];
+                const mergedItems = [ ...incompleteTasks, ...noteObj[firstNote].items ];
+                noteObj[firstNote].items = mergedItems;
+              }
+
+              Utils.makeNote(noteObj);
+              const watchCmd = 'nono watch';
+              console.log(`\nGreat success! Here is your note for today: \n${chalk.cyan(noteMdPath)}`);
+              console.log(`\nYou can see the note by running ${chalk.green(watchCmd)} anywhere in your console!`);
+            });
+          });
+        });
+      });
+    });
   });
 
 
@@ -55,7 +101,7 @@ program
 
         fs.access(noteMd, fs.constants.F_OK, (err) => {
           if (err && err.code === 'ENOENT') {
-            const badNotePath = chalk.blue(noteMd);
+            const badNotePath = chalk.cyan(noteMd);
             const newNoteCmd = chalk.green('nono new');
             console.log(`
 Oh man, oh jeez, ok, I-I-I can't access this note:
