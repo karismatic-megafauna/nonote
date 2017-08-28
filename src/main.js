@@ -11,183 +11,7 @@ import fs from 'fs-extra';
 import moment from 'moment';
 import co from 'co';
 import prompt from 'co-prompt';
-import templateJSON from '../templates/default.json';
-import { exec } from 'child_process';
-
-var emptyFunc = () => {};
-
-function makeNote(jsonObj, cb = emptyFunc) {
-  var dir = getDateDir();
-  var toMd = `${dir}/note.md`;
-  var noteMd = fs.createWriteStream(toMd);
-
-  Object.keys(jsonObj).map(function(title) {
-    var cliRef = jsonObj[title]['cli-ref'];
-    noteMd.write(`# ${title} --> ${cliRef}\n`);
-    Object.keys(jsonObj[title]['items']).map(function(items, index){
-      var status = jsonObj[title]['items'][items]['status'];
-      var checkBox = '- [ ]';
-      var itemIndex = ` ${index}.) `;
-      if (status === 'complete') {
-        checkBox = '- [x]';
-      } else if (status === 'failed') {
-        checkBox = '- [-]';
-      }
-      noteMd.write(checkBox + itemIndex + jsonObj[title]['items'][items]['description'] + "\n");
-    });
-    noteMd.write("\n");
-  });
-  noteMd.on('finish', cb);
-  noteMd.end();
-  // console.log(`note for ${dir} modified!`);
-}
-
-function removeSection(section) {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-
-  Object.keys(dataJSON).map(note => {
-    if ( dataJSON[note]['cli-ref'] === section ) {
-      console.log(`"${chalk.cyan(note)}" section was removed!`);
-      delete dataJSON[note];
-    }
-  });
-
-  fs.writeJsonSync(toData, dataJSON);
-  makeNote(dataJSON);
-}
-
-function createSection(name, cliRef, description = 'no description') {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-  dataJSON[name] = {
-    'cli-ref': cliRef,
-    'description': description,
-    'items': []
-  };
-  fs.writeJsonSync(toData, dataJSON);
-  makeNote(dataJSON, () => {process.exit();});
-
-  // TODO: make makenote sycronus
-}
-
-function addNote(noteObj, key) {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-  var noteString = noteObj.reduce(function(memo, word){
-    return memo + ' ' + word;
-  });
-
-  var descriptionObj = {
-    description: noteString,
-    status: 'incomplete',
-  };
-
-  // modify toData
-  Object.keys(dataJSON).map(function(note){
-    if (dataJSON[note]['cli-ref'] === key) {
-      dataJSON[note]['items'].push(descriptionObj);
-      fs.writeJsonSync(toData, dataJSON);
-    }
-  });
-  makeNote(dataJSON);
-}
-
-function changeStatus(index, key, cb) {
-  var dir = getDateDir();
-  var toData = `${dir}/data.json`;
-  var dataJSON = fs.readJsonSync(toData);
-  var cliFound = false;
-  Object.keys(dataJSON).map(function(note, noteIndex){
-    if (dataJSON[note]['cli-ref'] === key) {
-      cliFound = true;
-      if (!dataJSON[note]['items'][index]) {
-        throw new Error(`index ${index} in "${key}" object does not exist`);
-      }
-      cb(dataJSON[note]['items'], index);
-      fs.writeJsonSync(toData, dataJSON);
-    } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
-      throw new Error(`"${key}" <cli-ref> does not exist`);
-    }
-  });
-  makeNote(dataJSON, () => {process.exit();});
-}
-
-function removeNote(arry, index) {
-  arry.splice(index, 1);
-}
-
-function completeNote(arry, index) {
-  arry[index]['status'] = 'complete';
-}
-
-function incompleteNote(arry, index) {
-  arry[index]['status'] = 'incomplete';
-}
-
-function failNote(arry, index) {
-  arry[index]['status'] = 'failed';
-}
-
-function initializeNotes(userDir) {
-  var lastChar = userDir.substr(userDir.length - 1);
-  if ( lastChar === "/" ) {
-    userDir = userDir.slice(0, -1);
-  }
-
-  var doubleIndex = userDir.indexOf("//");
-  if ( doubleIndex > -1 ) {
-    userDir = userDir.slice(0, doubleIndex) + userDir.slice(doubleIndex + 1);
-  }
-
-  var rcFile = `${process.env.HOME}/.nonoterc.json`;
-  fs.closeSync(fs.openSync(rcFile, 'w'));
-
-  var dotFileJSON = {}
-  dotFileJSON.notesDirectory = userDir;
-
-  fs.writeJsonSync(rcFile, dotFileJSON);
-  console.log(chalk.green('Success!'));
-  console.log(' ');
-  console.log('dotfile `.nonoterc.json` created at $HOME' );
-  console.log(' ');
-  console.log('Notes will be made in this directory: ')
-  console.log(chalk.cyan(dotFileJSON.notesDirectory));
-  console.log(' ');
-}
-
-function getRootDir() {
-  var config = `${process.env.HOME}/.nonoterc.json`;
-  // TODO: handle the case of `nonote new` when `nonote init` has not been run
-  return fs.readJsonSync(config).notesDirectory;
-}
-
-function getDateDir(type) {
-  const today = moment().format("DD-MM-YYYY");
-  const notesDir = getRootDir();
-  const days = `${notesDir}/days/`;
-  const toDir = days + today;
-  return toDir;
-}
-
-function createDir(create, path) {
-  var templateDest = path + '/templates/';
-  var templateFile = path + '/templates/default.json';
-  if (create) {
-    fs.mkdirsSync(path);
-    fs.mkdirsSync(templateDest);
-    fs.closeSync(fs.openSync(templateFile, 'w'));
-    fs.writeJsonSync(templateFile, templateJSON);
-    console.log(' ');
-    console.log(chalk.green('Success!'));
-  } else {
-    console.log(' ');
-    console.log('Make sure that dir exists and has a templates dir in it with a note config!');
-  }
-}
+import * as Utils from './utils';
 
 program
   .version('0.0.1')
@@ -198,45 +22,117 @@ program
     if(!template) {
       template = 'default';
     }
-    const notePath = getDateDir();
-    const noteJSON = `${notePath}/data.json`;
-    const rootDir = getRootDir();
-    const templateData = `${rootDir}/templates/${template}.json`;
+    const today = moment().format("DD-MM-YYYY");
+    const yesterday = moment().subtract(1, 'day').format("DD-MM-YYYY");
+    var configPath = `${process.env.HOME}/.nonoterc.json`;
 
-    console.log(`creating new note from the ${chalk.cyan(template)} template!`);
+    fs.readJson(configPath, (err, configObj) => {
+      if (err) console.error(err)
 
-    fs.mkdirsSync(notePath);
-    fs.copySync(templateData, noteJSON);
-    makeNote(fs.readJsonSync(noteJSON));
+      const notesDir = configObj.notesDirectory;
+      const days = `${notesDir}/days/`;
+      const todayPath = days + today;
+      const yesterdayPath = days + yesterday;
+      const yesterdayDataJSONPath= `${yesterdayPath}/data.json`;
+      const dataJSONPath = `${todayPath}/data.json`;
+      const noteMdPath = `${todayPath}/note.md`;
 
-    console.log(`\nnew note created for today: \n${chalk.cyan(notePath)}`);
+      const templateDataPath = `${notesDir}/templates/${template}.json`;
+
+      fs.mkdirs(todayPath, (err) => {
+        if (err) console.error(err)
+
+        fs.copy(templateDataPath, dataJSONPath, (err) => {
+          if (err) console.error(err)
+
+          fs.readJson(yesterdayDataJSONPath, (err, yesterdayObj) => {
+            let hasPreviousNote = true;
+            let incompleteTasks = [];
+
+            if (err && err.code === 'ENOENT') {
+              hasPreviousNote = false;
+            }
+
+            if (hasPreviousNote) {
+              incompleteTasks = Object.keys(yesterdayObj).map(section => {
+                return yesterdayObj[section].items.filter(item => {
+                  return item.status !== "complete"
+                });
+              })[0];
+            }
+
+            fs.readJson(dataJSONPath, (err, noteObj) => {
+              console.log(`Creating new note from the ${chalk.green(template)} template...`);
+              if (hasPreviousNote && incompleteTasks.length > 0) {
+                console.log(`\nCopying ${chalk.cyan(incompleteTasks.length)} incomplete tasks from yesterday:`);
+                incompleteTasks.forEach((task, i) => console.log(`   ${chalk.cyan(i)}.) ${task.description}`));
+                const firstNote = Object.keys(noteObj)[0];
+                const mergedItems = [ ...incompleteTasks, ...noteObj[firstNote].items ];
+                noteObj[firstNote].items = mergedItems;
+              }
+
+              fs.writeJson(dataJSONPath, noteObj, (err) => {
+                if (err) return console.error(err)
+
+                Utils.makeNote(noteObj);
+                const watchCmd = 'nono watch';
+                console.log(`\nGreat success! Here is your note for today: \n${chalk.cyan(noteMdPath)}`);
+                console.log(`\nYou can see the note by running ${chalk.green(watchCmd)} anywhere in your console!`);
+              });
+            })
+          });
+        });
+      });
+    });
   });
+
 
 program
   .command('watch')
   .alias('w')
   .description('watches todays note')
   .action(function(){
-    const notePath = getDateDir();
-    const noteMd = `${notePath}/note.md`;
-    const cb = (err, stdout, stderr) => {
-      console.log(`${stdout}`);
-    }
+    co(function *() {
+      const today = moment().format("DD-MM-YYYY");
+      var configPath = `${process.env.HOME}/.nonoterc.json`;
+      fs.readJson(configPath, (err, configJSON) => {
+        if (err) console.error(err)
 
+        const notesDir = configJSON.notesDirectory;
+        const days = `${notesDir}/days/`;
+        const toDir = days + today;
+        const noteMd = `${toDir}/note.md`;
 
-    fs.stat(noteMd, (err, stat) => {
-      if (err === null) {
-        exec(`clear`, cb);
-        exec(`cat ${noteMd}`, cb);
+        fs.access(noteMd, fs.constants.F_OK, (err) => {
+          if (err && err.code === 'ENOENT') {
+            const badNotePath = chalk.cyan(noteMd);
+            const newNoteCmd = chalk.green('nono new');
+            console.log(`
+Oh man, oh jeez, ok, I-I-I can't access this note:
+${badNotePath}
 
-        fs.watch(noteMd, () => {
-          exec(`clear`, cb);
-          exec(`cat ${noteMd}`, cb);
+C-c-can you try m-m-making a new note or s-s-something?
+${newNoteCmd}
+            `);
+            return;
+          }
+
+          fs.readFile(noteMd, (err, data) => {
+            if (err) throw err;
+            console.log('\x1Bc');
+            console.log(data.toString());
+          });
+
+          fs.watch(noteMd, () => {
+            fs.readFile(noteMd, (err, data) => {
+              if (err) throw err;
+              console.log('\x1Bc');
+              console.log(data.toString());
+            });
+          });
         });
-      } else if (err.code === 'ENOENT') {
-        console.log(`You need to make a note for today by running: \nnono new`);
-      }
-    })
+      });
+    });
   });
 
 
@@ -244,16 +140,16 @@ program
   .command('section')
   .alias('s')
   .description('create new section')
-  .action( function() {
+  .action(function() {
     co(function *() {
       const sectionName = yield prompt('New section name: ');
       const cliRefName = yield prompt('Cli reference key: ');
       const description = yield prompt('Short description: ');
 
-      createSection(sectionName, cliRefName, description);
+      Utils.createSection(sectionName, cliRefName, description);
 
       console.log(chalk.green(`new section '${sectionName}' was created!`));
-    })
+    });
   });
 
 program
@@ -261,13 +157,12 @@ program
   .description('initializes notes')
   .action(function() {
     co(function *() {
-
       const notesDirPath = yield prompt('notes directory path (from $HOME): ');
       const homePath = `${process.env.HOME}/${notesDirPath}`;
-      initializeNotes(homePath);
+      Utils.initializeNotes(homePath);
 
       const shouldCreate = yield prompt.confirm(`Would you like me to create "${homePath}" for you?(Recommended) [y/N] `);
-      createDir(shouldCreate, homePath);
+      Utils.createDir(shouldCreate, homePath);
       console.log('Start taking notes with', chalk.cyan('nonote new!'));
       // TODO: create a readme
       process.exit();
@@ -280,7 +175,7 @@ program
   .description('add note to object')
   .action(function(ref, note) {
     try {
-      addNote(note, ref);
+      Utils.addNote(note, ref);
       console.log(chalk.green('note added!'));
     } catch (e) {
       console.log(chalk.red(e));
@@ -294,10 +189,10 @@ program
   .description('remove note from note object')
   .action(function(ref, note, options) {
     if (options.section && note === undefined) {
-      removeSection(ref);
+      Utils.removeSection(ref);
     } else {
       try {
-        changeStatus(note, ref, removeNote);
+        Utils.changeStatus(note, ref, Utils.removeNote);
         console.log(chalk.green(`note at index[${note}] was removed!`));
       } catch (e) {
         console.log(chalk.red(e));
@@ -311,7 +206,7 @@ program
   .description('mark item as complete')
   .action(function(ref, note) {
     try {
-      changeStatus(note, ref, completeNote);
+      Utils.changeStatus(note, ref, Utils.completeNote);
       console.log(chalk.green(`note at index[${note}] was marked as complete!`));
     } catch (e) {
       console.log(chalk.red(e));
@@ -324,7 +219,7 @@ program
   .description('mark item as incomplete')
   .action(function(ref, note) {
     try {
-      changeStatus(note, ref, incompleteNote);
+      Utils.changeStatus(note, ref, Utils.incompleteNote);
       console.log(chalk.green(`note at index[${note}] was marked as incomplete!`));
     } catch (e) {
       console.log(chalk.red(e));
@@ -338,7 +233,7 @@ program
   .description('mark item as failed')
   .action(function(ref, note) {
     try {
-      changeStatus(note, ref, failNote);
+      Utils.changeStatus(note, ref, Utils.failNote);
       console.log(chalk.green(`note at index[${note}] was marked as failed :(`));
     } catch (e) {
       console.log(chalk.red(e));
