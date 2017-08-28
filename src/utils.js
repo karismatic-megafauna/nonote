@@ -19,20 +19,14 @@ export function failNote(arry, index) {
   arry[index]['status'] = 'failed';
 }
 
-export function createDir(create, path) {
+export function createDir(path) {
   var templateDest = path + '/templates/';
   var templateFile = path + '/templates/default.json';
-  if (create) {
-    fs.mkdirsSync(path);
-    fs.mkdirsSync(templateDest);
-    fs.closeSync(fs.openSync(templateFile, 'w'));
-    fs.writeJsonSync(templateFile, templateJSON);
-    console.log(' ');
-    console.log(chalk.green('Success!'));
-  } else {
-    console.log(' ');
-    console.log('Make sure that dir exists and has a templates dir in it with a note config!');
-  }
+  fs.mkdirsSync(path);
+  fs.mkdirsSync(templateDest);
+  fs.closeSync(fs.openSync(templateFile, 'w'));
+  fs.writeJsonSync(templateFile, templateJSON);
+  console.log(chalk.green('Success!'));
 }
 
 export function getRootDir() {
@@ -67,9 +61,7 @@ export function initializeNotes(userDir) {
   dotFileJSON.notesDirectory = userDir;
 
   fs.writeJsonSync(rcFile, dotFileJSON);
-  console.log(chalk.green('Success!'));
-  console.log(' ');
-  console.log('dotfile `.nonoterc.json` created at $HOME' );
+  console.log(`\ndotfile ".nonoterc.json" created at ${process.env.HOME}` );
   console.log(' ');
   console.log('Notes will be made in this directory: ')
   console.log(chalk.cyan(dotFileJSON.notesDirectory));

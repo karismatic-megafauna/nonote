@@ -161,9 +161,8 @@ program
       const homePath = `${process.env.HOME}/${notesDirPath}`;
       Utils.initializeNotes(homePath);
 
-      const shouldCreate = yield prompt.confirm(`Would you like me to create "${homePath}" for you?(Recommended) [y/N] `);
-      Utils.createDir(shouldCreate, homePath);
-      console.log('Start taking notes with', chalk.cyan('nonote new!'));
+      Utils.createDir(homePath);
+      console.log('Start taking notes with', chalk.green('nonote new!'));
       // TODO: create a readme
       process.exit();
     })
