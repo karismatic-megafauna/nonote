@@ -47,28 +47,56 @@ program
 
           fs.readJson(yesterdayDataJSONPath, (err, yesterdayObj) => {
             let hasPreviousNote = true;
-            let incompleteTasks = [];
+            let incompleteSections = [];
 
             if (err && err.code === 'ENOENT') {
               hasPreviousNote = false;
             }
 
             if (hasPreviousNote) {
-              incompleteTasks = Object.keys(yesterdayObj).map(section => {
-                return yesterdayObj[section].items.filter(item => {
+              incompleteSections = Object.keys(yesterdayObj).map(section => {
+                const incompleteItems = yesterdayObj[section].items.filter(item => {
                   return item.status !== "complete"
                 });
-              })[0];
+
+                return {
+                  [section]: {
+                    items: incompleteItems,
+                    description: yesterdayObj[section].description,
+                    ['cli-ref']: yesterdayObj[section]['cli-ref'],
+                  }
+                }
+              });
             }
 
             fs.readJson(dataJSONPath, (err, noteObj) => {
               console.log(`Creating new note from the ${chalk.green(template)} template...`);
-              if (hasPreviousNote && incompleteTasks.length > 0) {
-                console.log(`\nCopying ${chalk.cyan(incompleteTasks.length)} incomplete tasks from yesterday:`);
-                incompleteTasks.forEach((task, i) => console.log(`   ${chalk.cyan(i)}.) ${task.description}`));
-                const firstNote = Object.keys(noteObj)[0];
-                const mergedItems = [ ...incompleteTasks, ...noteObj[firstNote].items ];
-                noteObj[firstNote].items = mergedItems;
+              if (hasPreviousNote && incompleteSections.length > 0) {
+                incompleteSections.forEach((incompleteSection) => {
+                  Object.keys(incompleteSection).map((name) =>{
+                    console.log(`\nCopying ${chalk.yellow(name)} incomplete tasks from yesterday:`);
+                    const currentSection = incompleteSection[name];
+                    currentSection.items.forEach((item, i) =>  {
+                      const number = chalk.bold(`${i}.)`);
+                      const description = chalk.hex('#a1a1a1').bold(item.description);
+                      console.log(`   ${number} ${description}`);
+                    });
+
+                    if( noteObj[name] === undefined) {
+                      noteObj[name] = {
+                        items: currentSection.items,
+                        description: currentSection.description,
+                        ['cli-ref']: currentSection['cli-ref'],
+                      };
+                    } else {
+                      noteObj[name] = {
+                        items: [ ...noteObj[name].items, ...currentSection.items ],
+                        description: currentSection.description,
+                        ['cli-ref']: currentSection['cli-ref'],
+                      };
+                    }
+                  });
+                });
               }
 
               fs.writeJson(dataJSONPath, noteObj, (err) => {

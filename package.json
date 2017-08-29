@@ -34,7 +34,7 @@
   "homepage": "https://github.com/michaelghinrichs/nonote#readme",
   "dependencies": {
     "babel-polyfill": "^6.7.4",
-    "chalk": "^1.1.1",
+    "chalk": "2.0.0",
     "co": "^4.6.0",
     "co-prompt": "^1.0.0",
     "commander": "^2.9.0",
