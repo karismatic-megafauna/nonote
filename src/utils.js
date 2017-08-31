@@ -83,19 +83,19 @@ export function changeStatus(index, key, cb) {
       if (err) console.error(err)
 
       var cliFound = false;
-      Object.keys(dataJSON).map(function(note, noteIndex){
-        if (dataJSON[note]['cli-ref'] === key) {
+      dataJSON.forEach((note, noteIndex) => {
+        if (note['cli-ref'] === key) {
           cliFound = true;
-          if (!dataJSON[note]['items'][index]) {
+          if (!note.items[index]) {
             throw new Error(`index ${index} in "${key}" object does not exist`);
           }
-          cb(dataJSON[note]['items'], index);
+          cb(note.items, index);
           fs.writeJson(toData, dataJSON, (err) => {
             if (err) return console.error(err)
 
             makeNote(dataJSON, () => {process.exit();});
           });
-        } else if (Object.keys(dataJSON).length === (noteIndex + 1) && !cliFound) {
+        } else if (dataJSON.length === (noteIndex + 1) && !cliFound) {
           throw new Error(`"${key}" <cli-ref> does not exist`);
         }
       });
@@ -105,16 +105,16 @@ export function changeStatus(index, key, cb) {
 
 var emptyFunc = () => {};
 
-export function makeNote(jsonObj, cb = emptyFunc) {
+export function makeNote(notesData, cb = emptyFunc) {
   var dir = getDateDir();
   var toMd = `${dir}/note.md`;
   var noteMd = fs.createWriteStream(toMd);
 
-  Object.keys(jsonObj).map(function(title) {
-    var cliRef = jsonObj[title]['cli-ref'];
-    noteMd.write(`# ${title} --> ${cliRef}\n`);
-    Object.keys(jsonObj[title]['items']).map(function(items, index){
-      var status = jsonObj[title]['items'][items]['status'];
+  notesData.forEach((section) => {
+    var cliRef = section['cli-ref'];
+    noteMd.write(`# ${section.title} --> ${cliRef}\n`);
+    section.items.forEach((item, index) => {
+      var status = item.status;
       var checkBox = '- [ ]';
       var itemIndex = ` ${index}.) `;
       if (status === 'complete') {
@@ -122,7 +122,7 @@ export function makeNote(jsonObj, cb = emptyFunc) {
       } else if (status === 'failed') {
         checkBox = '- [-]';
       }
-      noteMd.write(checkBox + itemIndex + jsonObj[title]['items'][items]['description'] + "\n");
+      noteMd.write(checkBox + itemIndex + item.description + "\n");
     });
     noteMd.write("\n");
   });
@@ -200,11 +200,10 @@ export function addNote(noteObj, key) {
       status: 'incomplete',
     };
 
-    // modify toData
     fs.readJson(dataPath, (err, dataJSON) => {
-      Object.keys(dataJSON).map(function(note){
-        if (dataJSON[note]['cli-ref'] === key) {
-          dataJSON[note]['items'].push(descriptionObj);
+      dataJSON.forEach((note) => {
+        if (note['cli-ref'] === key) {
+          note.items.push(descriptionObj);
           fs.writeJson(dataPath, dataJSON, (err) => {
             if (err) return console.error(err)
 
