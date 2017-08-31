@@ -140,17 +140,18 @@ export function removeSection(section) {
     var dataPath = `${dir}/data.json`;
     fs.readJson(dataPath, (err, dataJSON) => {
 
-      Object.keys(dataJSON).map(note => {
-        if ( dataJSON[note]['cli-ref'] === section ) {
-          console.log(`"${chalk.cyan(note)}" section was removed!`);
-          delete dataJSON[note];
+      const filteredDataJSON = dataJSON.filter((note) => {
+        const keepSection = note['cli-ref'] !== section;
+        if (!keepSection) {
+          console.log(`"${chalk.cyan(note.title)}" section was removed!`);
         }
+        return keepSection;
       });
 
-      fs.writeJson(dataPath, dataJSON, (err) => {
+      fs.writeJson(dataPath, filteredDataJSON, (err) => {
         if (err) return console.error(err)
 
-        makeNote(dataJSON);
+        makeNote(filteredDataJSON);
       })
     });
   });
@@ -165,11 +166,12 @@ export function createSection(name, cliRef, description = 'no description') {
     const dir = days + today;
     var dataPath = `${dir}/data.json`;
     fs.readJson(dataPath, (err, dataJSON) => {
-      dataJSON[name] = {
+      dataJSON.push({
+        'title': name,
         'cli-ref': cliRef,
         'description': description,
-        'items': []
-      };
+        'items': [],
+      });
 
       fs.writeJson(dataPath, dataJSON, (err) => {
         if (err) return console.error(err)
