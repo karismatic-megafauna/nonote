@@ -3,6 +3,14 @@ import moment from 'moment';
 import chalk from 'chalk';
 import templateJSON from '../templates/default.json';
 
+export function printIncompleteItems(itemsArry) {
+  itemsArry.forEach((item, i) =>  {
+    const number = chalk.bold(`${i}.)`);
+    const description = chalk.hex('#a1a1a1').bold(item.description);
+    console.log(`   ${number} ${description}`);
+  });
+}
+
 export function removeNote(arry, index) {
   arry.splice(index, 1);
 }

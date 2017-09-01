@@ -45,7 +45,7 @@ program
         fs.copy(templateDataPath, dataJSONPath, (err) => {
           if (err) console.error(err)
 
-          fs.readJson(yesterdayDataJSONPath, (err, yesterdayObj) => {
+          fs.readJson(yesterdayDataJSONPath, (err, yesterdayData) => {
             let hasPreviousNote = true;
             let incompleteSections = [];
 
@@ -54,55 +54,38 @@ program
             }
 
             if (hasPreviousNote) {
-              incompleteSections = Object.keys(yesterdayObj).map(section => {
-                const incompleteItems = yesterdayObj[section].items.filter(item => {
+              incompleteSections = yesterdayData.map(section => {
+                const incompleteItems = section.items.filter(item => {
                   return item.status !== "complete"
                 });
 
-                return {
-                  [section]: {
-                    items: incompleteItems,
-                    description: yesterdayObj[section].description,
-                    ['cli-ref']: yesterdayObj[section]['cli-ref'],
-                  }
-                }
+                return Object.assign(section, {items: incompleteItems})
               });
             }
 
-            fs.readJson(dataJSONPath, (err, noteObj) => {
+            fs.readJson(dataJSONPath, (err, dataJSON) => {
               console.log(`Creating new note from the ${chalk.green(template)} template...`);
               if (hasPreviousNote && incompleteSections.length > 0) {
                 incompleteSections.forEach((incompleteSection) => {
-                  Object.keys(incompleteSection).map((name) =>{
-                    console.log(`\nCopying ${chalk.yellow(name)} incomplete tasks from yesterday:`);
-                    const currentSection = incompleteSection[name];
-                    currentSection.items.forEach((item, i) =>  {
-                      const number = chalk.bold(`${i}.)`);
-                      const description = chalk.hex('#a1a1a1').bold(item.description);
-                      console.log(`   ${number} ${description}`);
-                    });
+                  console.log(`\nCopying ${chalk.yellow(incompleteSection.title)} incomplete tasks from yesterday:`);
 
-                    if( noteObj[name] === undefined) {
-                      noteObj[name] = {
-                        items: currentSection.items,
-                        description: currentSection.description,
-                        ['cli-ref']: currentSection['cli-ref'],
-                      };
-                    } else {
-                      noteObj[name] = {
-                        items: [ ...noteObj[name].items, ...currentSection.items ],
-                        description: currentSection.description,
-                        ['cli-ref']: currentSection['cli-ref'],
-                      };
-                    }
-                  });
+                  Utils.printIncompleteItems(incompleteSection.items);
+
+                  const existingSectionIndex = dataJSON.findIndex((data) => data.title === incompleteSection.title);
+
+                  if(existingSectionIndex === -1) {
+                    dataJSON.push(incompleteSection);
+                  } else {
+                    const mergedItems = [ ...dataJSON[existingSectionIndex].items, ...incompleteSection.items ];
+                    dataJSON[existingSectionIndex] = Object.assign(incompleteSection, { items: mergedItems });
+                  }
                 });
               }
 
-              fs.writeJson(dataJSONPath, noteObj, (err) => {
+              fs.writeJson(dataJSONPath, dataJSON, (err) => {
                 if (err) return console.error(err)
 
-                Utils.makeNote(noteObj);
+                Utils.makeNote(dataJSON);
                 const watchCmd = 'nono watch';
                 console.log(`\nGreat success! Here is your note for today: \n${chalk.cyan(noteMdPath)}`);
                 console.log(`\nYou can see the note by running ${chalk.green(watchCmd)} anywhere in your console!`);
