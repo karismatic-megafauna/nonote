@@ -3,6 +3,8 @@ import moment from 'moment';
 import chalk from 'chalk';
 import templateJSON from '../templates/default.json';
 
+export const getDirs = dir => fs.readdirSync(dir).filter(f => fs.statSync(dir+"/"+f).isDirectory())
+
 export function printIncompleteItems(itemsArry) {
   itemsArry.forEach((item, i) =>  {
     const number = chalk.bold(`${i}.)`);

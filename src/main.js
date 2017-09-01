@@ -23,7 +23,6 @@ program
       template = 'default';
     }
     const today = moment().format("DD-MM-YYYY");
-    const yesterday = moment().subtract(1, 'day').format("DD-MM-YYYY");
     var configPath = `${process.env.HOME}/.nonoterc.json`;
 
     fs.readJson(configPath, (err, configObj) => {
@@ -32,10 +31,12 @@ program
       const notesDir = configObj.notesDirectory;
       const days = `${notesDir}/days/`;
       const todayPath = days + today;
-      const yesterdayPath = days + yesterday;
-      const yesterdayDataJSONPath= `${yesterdayPath}/data.json`;
       const dataJSONPath = `${todayPath}/data.json`;
       const noteMdPath = `${todayPath}/note.md`;
+
+      const lastNote = Utils.getDirs(days).pop();
+      const lastNotePath = days + lastNote;
+      const lastNoteDataJSONPath = `${lastNotePath}/data.json`;
 
       const templateDataPath = `${notesDir}/templates/${template}.json`;
 
@@ -45,7 +46,7 @@ program
         fs.copy(templateDataPath, dataJSONPath, (err) => {
           if (err) console.error(err)
 
-          fs.readJson(yesterdayDataJSONPath, (err, yesterdayData) => {
+          fs.readJson(lastNoteDataJSONPath, (err, lastNoteData) => {
             let hasPreviousNote = true;
             let incompleteSections = [];
 
@@ -54,7 +55,7 @@ program
             }
 
             if (hasPreviousNote) {
-              incompleteSections = yesterdayData.map(section => {
+              incompleteSections = lastNoteData.map(section => {
                 const incompleteItems = section.items.filter(item => {
                   return item.status !== "complete"
                 });
