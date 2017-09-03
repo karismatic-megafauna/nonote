@@ -122,7 +122,15 @@ export function makeNote(notesData, cb = emptyFunc) {
 
   notesData.forEach((section) => {
     var cliRef = section['cli-ref'];
-    noteMd.write(`# ${section.title} --> ${cliRef}\n`);
+    const completedItems = section.items
+      .filter(item => item.status === "complete")
+      .length
+
+    const itemCount = section.items.length;
+    const Header =
+      `# ${section.title}: ${cliRef} --> ( ${completedItems} / ${itemCount} )\n`
+
+    noteMd.write(Header);
     section.items.forEach((item, index) => {
       var status = item.status;
       var checkBox = '- [ ]';
